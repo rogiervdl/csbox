@@ -1,0 +1,396 @@
+/* =====================================================
+   CSBox — Dark theme layout
+   ===================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-base:       #1e1e1e;
+  --bg-toolbar:    #252526;
+  --bg-pane:       #1e1e1e;
+  --bg-header:     #2d2d30;
+  --border:        #3e3e42;
+  --text-primary:  #cccccc;
+  --text-muted:    #858585;
+  --accent-run:    #0e7a3d;
+  --accent-run-h:  #11a050;
+  --accent-dl:     #2b5797;
+  --accent-dl-h:   #3a6ec0;
+  --accent-cs:     #512bd4;
+  --resizer-w:     5px;
+  --toolbar-h:     44px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+/* ── Toolbar ──────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--toolbar-h);
+  background: var(--bg-toolbar);
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.toolbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar__logo {
+  width: 22px;
+  height: 22px;
+  color: var(--accent-cs);
+}
+
+.toolbar__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #d4d4d4;
+  letter-spacing: 0.5px;
+}
+
+.toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Buttons ──────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.15s, opacity 0.15s;
+  color: #ffffff;
+  background: #3c3c3c;
+  white-space: nowrap;
+}
+
+.btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.btn:hover { background: #4a4a4a; }
+.btn:active { opacity: 0.8; }
+
+.btn--primary { background: var(--accent-run); }
+.btn--primary:hover { background: var(--accent-run-h); }
+
+.btn--primary.is-running {
+  background: #555;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn--secondary { background: var(--accent-dl); }
+.btn--secondary:hover { background: var(--accent-dl-h); }
+
+/* ── Buttons ──────────────────────────────────────── */
+.btn--icon { color: var(--text-primary); }
+
+/* ── Workspace ────────────────────────────────────── */
+.workspace {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - var(--toolbar-h));
+  overflow: hidden;
+}
+
+/* Gestapeld: editor boven, output+fouten onder */
+.workspace.layout-stacked {
+  flex-direction: column;
+}
+
+.workspace.layout-stacked .editor-panel {
+  flex: 0 0 50%;
+  min-width: 0;
+  width: 100%;
+  border-right: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.workspace.layout-stacked .resizer--main {
+  width: auto;
+  height: var(--resizer-w);
+  cursor: row-resize;
+}
+
+.workspace.layout-stacked .right-panel {
+  flex-direction: row;
+  min-width: 0;
+  width: 100%;
+}
+
+.workspace.layout-stacked .output-panel {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 80px;
+  border-right: 1px solid var(--border);
+}
+
+.workspace.layout-stacked .resizer--vertical {
+  width: var(--resizer-w);
+  height: auto;
+  cursor: col-resize;
+}
+
+.workspace.layout-stacked .errors-panel {
+  flex: 0 0 280px;
+  min-height: 0;
+  border-top: none;
+  border-left: 1px solid var(--border);
+}
+
+/* ── Panel headers ────────────────────────────────── */
+.panel-header {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.panel-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.panel-label--cs { color: var(--accent-cs); }
+
+.panel-body {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Editor panel (left) ──────────────────────────── */
+.editor-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 50%;
+  min-width: 200px;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+/* ── Right panel ──────────────────────────────────── */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+/* ── Output panel ─────────────────────────────────── */
+.output-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 80px;
+  overflow: hidden;
+  background: #0d0d0d;
+}
+
+.output-body {
+  overflow-y: auto;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 8px 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #cccccc;
+}
+
+.output-line {
+  padding: 1px 0;
+}
+
+/* ── Errors panel ─────────────────────────────────── */
+.errors-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 180px;
+  min-height: 30px;
+  border-top: 1px solid var(--border);
+  background: #0d0d0d;
+  overflow: hidden;
+  transition: flex-basis 0.2s;
+}
+
+.errors-panel.is-collapsed {
+  flex: 0 0 30px;
+}
+
+.errors-panel.is-collapsed .errors-body {
+  display: none;
+}
+
+.errors-panel.is-collapsed .btn-collapse svg {
+  transform: rotate(180deg);
+}
+
+.errors-body {
+  flex: 1;
+  overflow-y: auto;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 4px 0;
+}
+
+.error-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2px 12px;
+  color: #f47067;
+  background: #1a0808;
+  border-bottom: 1px solid #2a1010;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.error-entry--warning {
+  color: #e5c07b;
+  background: #1a1400;
+  border-bottom-color: #2a2000;
+}
+
+.error-entry__location {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 60px;
+}
+
+.error-entry__text { flex: 1; }
+
+/* ── Badges ───────────────────────────────────────── */
+.errors-badge {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #c0392b;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.errors-badge.visible { display: inline-flex; }
+
+/* ── Collapse button ──────────────────────────────── */
+.btn-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  border-radius: 3px;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.btn-collapse:hover {
+  color: var(--text-primary);
+  background: #3e3e42;
+}
+
+.btn-collapse svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s;
+}
+
+/* ── Clear button ─────────────────────────────────── */
+.console-clear-btn {
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 500;
+  background: #3c3c3c;
+  color: var(--text-muted);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.console-clear-btn:hover { background: #4a4a4a; color: var(--text-primary); }
+
+/* ── Resizers ─────────────────────────────────────── */
+.resizer {
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.resizer:hover,
+.resizer.is-dragging {
+  background: var(--accent-cs);
+}
+
+.resizer--main {
+  width: var(--resizer-w);
+  cursor: col-resize;
+}
+
+.resizer--vertical {
+  height: var(--resizer-w);
+  cursor: row-resize;
+}
+
+/* ── Spinner in run button ────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn--primary.is-running svg {
+  animation: spin 0.8s linear infinite;
+}
+
+/* ── Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #777; }

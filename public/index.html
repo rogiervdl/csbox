@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSBox</title>
+  <link rel="stylesheet" href="/vendor/monaco-editor/min/vs/editor/editor.main.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <header class="toolbar">
+    <div class="toolbar__brand">
+      <svg class="toolbar__logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 6h16M4 12h10M4 18h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="18" cy="15" r="4" stroke="currentColor" stroke-width="2"/>
+        <path d="M16.5 14h3M18 12.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="toolbar__title">CSBox</span>
+    </div>
+    <div class="toolbar__actions">
+      <button id="btn-layout" class="btn btn--icon" title="Wissel layout" aria-label="Wissel layout">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="18" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+          <rect x="3" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+          <rect x="13" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span>Layout</span>
+      </button>
+      <button id="btn-run" class="btn btn--primary" title="Voer code uit (Ctrl+Enter)">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="5,3 19,12 5,21" fill="currentColor"/>
+        </svg>
+        <span>Run</span>
+      </button>
+      <label class="btn btn--secondary" title="Upload .cs bestand" style="cursor:pointer">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21V9M8 13l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Upload</span>
+        <input type="file" id="input-upload" accept=".cs,.zip" style="display:none" />
+      </label>
+      <button id="btn-download" class="btn btn--secondary" title="Download als .cs bestand">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3v12M8 11l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Download</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace" id="workspace">
+
+    <div class="editor-panel" id="editor-panel">
+      <div class="panel-header">
+        <span class="panel-label panel-label--cs">C#</span>
+      </div>
+      <div class="panel-body" id="editor-cs"></div>
+    </div>
+
+    <div class="resizer resizer--main" id="main-resizer"></div>
+
+    <div class="right-panel" id="right-panel">
+
+      <div class="output-panel" id="output-panel">
+        <div class="panel-header">
+          <span class="panel-label">Output</span>
+          <button class="console-clear-btn" id="output-clear" title="Wis output">Wis</button>
+        </div>
+        <div class="panel-body output-body" id="output-body"></div>
+      </div>
+
+      <div class="resizer resizer--vertical" id="right-resizer"></div>
+
+      <div class="errors-panel" id="errors-panel">
+        <div class="panel-header" id="errors-toggle">
+          <span class="panel-label">Fouten</span>
+          <span class="errors-badge" id="errors-badge"></span>
+          <button class="console-clear-btn" id="errors-clear" title="Wis fouten">Wis</button>
+          <button class="btn-collapse" id="btn-errors-toggle" title="Klap in/uit">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 15l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="panel-body errors-body" id="errors-body"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="/vendor/jszip.min.js"></script>
+  <script>
+    var require = { paths: { vs: '/vendor/monaco-editor/min/vs' } };
+  </script>
+  <script src="/vendor/monaco-editor/min/vs/loader.js"></script>
+  <script src="/js/runner.js"></script>
+  <script src="/js/main.js"></script>
+
+</body>
+</html>
