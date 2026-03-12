@@ -19,6 +19,13 @@ COPY . .
 # Kopieer vendor bestanden (Monaco + JSZip)
 RUN npm run setup
 
+# Pre-warm: bouw een dummy project zodat NuGet packages gecached zijn
+# Hierdoor is de eerste echte run veel sneller
+COPY app/csbox-warmup.csproj /tmp/warmup/csbox-warmup.csproj
+RUN echo 'Console.WriteLine("warmup");' > /tmp/warmup/Program.cs && \
+    dotnet run --project /tmp/warmup/csbox-warmup.csproj && \
+    rm -rf /tmp/warmup
+
 # Render gebruikt poort via env variabele PORT
 ENV PORT=3003
 EXPOSE 3003

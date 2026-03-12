@@ -8,7 +8,7 @@ const { spawn } = require('child_process');
 const app  = express();
 const PORT = process.env.PORT || 3003;
 
-const TIMEOUT_MS = 10_000;
+const TIMEOUT_MS = 30_000;
 
 const CSPROJ = `<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -87,7 +87,7 @@ app.post('/api/run', function (req, res) {
     if (timedOut) {
       return res.json({
         output: stdout.split('\n').filter(l => l !== ''),
-        errors: [{ line: 0, col: 0, severity: 'error', message: 'Timeout: programma duurde langer dan 10 seconden.' }],
+        errors: [{ line: 0, col: 0, severity: 'error', message: 'Timeout: programma duurde langer dan 30 seconden.' }],
       });
     }
 
