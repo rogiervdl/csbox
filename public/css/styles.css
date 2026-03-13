@@ -389,6 +389,129 @@ html, body {
   animation: spin 0.8s linear infinite;
 }
 
+/* ── Terminal panel ───────────────────────────────── */
+.terminal-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 80px;
+  overflow: hidden;
+  background: #0d0d0d;
+}
+
+.terminal-status {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  flex: 1;
+  padding-left: 4px;
+}
+
+.terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 8px 12px;
+  margin: 0;
+  color: #cccccc;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.terminal-inputline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 6px;
+  border-top: 1px solid #1e1e1e;
+  flex-shrink: 0;
+}
+
+.terminal-caret {
+  color: var(--accent-cs);
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #cccccc;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  caret-color: var(--accent-cs);
+}
+
+.terminal-input:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.terminal-input::placeholder {
+  color: #444;
+}
+
+/* ── Stop button ──────────────────────────────────── */
+.btn--stop {
+  background: #7a1a1a;
+}
+.btn--stop:hover { background: #a02020; }
+
+/* ── Invoer panel ─────────────────────────────────── */
+.input-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 120px;
+  min-height: 30px;
+  border-top: 1px solid var(--border);
+  background: #0d0d0d;
+  overflow: hidden;
+  transition: flex-basis 0.2s;
+}
+
+.input-panel.is-collapsed {
+  flex: 0 0 30px;
+}
+
+.input-panel.is-collapsed .input-body {
+  display: none;
+}
+
+.input-panel.is-collapsed .btn-collapse svg {
+  transform: rotate(180deg);
+}
+
+.input-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-right: 6px;
+}
+
+.input-body {
+  flex: 1;
+  resize: none;
+  background: #0d0d0d;
+  color: #cccccc;
+  border: none;
+  outline: none;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 6px 12px;
+  overflow-y: auto;
+}
+
+.input-body::placeholder {
+  color: #444;
+}
+
 /* ── Scrollbar ────────────────────────────────────── */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }

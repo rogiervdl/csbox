@@ -33,6 +33,12 @@
         </svg>
         <span>Run</span>
       </button>
+      <button id="btn-stop" class="btn btn--stop" title="Stop programma" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor"/>
+        </svg>
+        <span>Stop</span>
+      </button>
       <label class="btn btn--secondary" title="Upload .cs bestand" style="cursor:pointer">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 21V9M8 13l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -56,6 +62,13 @@
     <div class="editor-panel" id="editor-panel">
       <div class="panel-header">
         <span class="panel-label panel-label--cs">C#</span>
+        <button id="btn-format" class="btn btn--xs btn--icon" title="Formatteer code (Alt+Shift+F)">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 6h18M3 12h12M3 18h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M17 15l3 3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Format</span>
+        </button>
       </div>
       <div class="panel-body" id="editor-cs"></div>
     </div>
@@ -64,12 +77,19 @@
 
     <div class="right-panel" id="right-panel">
 
-      <div class="output-panel" id="output-panel">
+      <div class="terminal-panel" id="terminal-panel">
         <div class="panel-header">
-          <span class="panel-label">Output</span>
-          <button class="console-clear-btn" id="output-clear" title="Wis output">Wis</button>
+          <span class="panel-label">Terminal</span>
+          <span class="terminal-status" id="terminal-status"></span>
+          <button class="console-clear-btn" id="terminal-clear" title="Wis terminal">Wis</button>
         </div>
-        <div class="panel-body output-body" id="output-body"></div>
+        <pre class="terminal-output" id="terminal-output"></pre>
+        <div class="terminal-inputline" id="terminal-inputline">
+          <span class="terminal-caret">›</span>
+          <input type="text" id="terminal-input" class="terminal-input"
+                 placeholder="Typ hier invoer en druk Enter..."
+                 autocomplete="off" spellcheck="false" disabled />
+        </div>
       </div>
 
       <div class="resizer resizer--vertical" id="right-resizer"></div>
@@ -95,7 +115,6 @@
     var require = { paths: { vs: '/vendor/monaco-editor/min/vs' } };
   </script>
   <script src="/vendor/monaco-editor/min/vs/loader.js"></script>
-  <script src="/js/runner.js"></script>
   <script src="/js/main.js"></script>
 
 </body>

@@ -20,8 +20,141 @@ class Program
     }
 }`;
 
-  // ── Monaco initialisatie ─────────────────────────────
+  // ── C# formatter ─────────────────────────────────────
+
+  // Splits een regel in segmenten: {text, protected}
+  // protected = true voor strings, char literals en commentaar (niet aanpassen)
+  function splitSegments(line) {
+    const segs = [];
+    let i = 0, cur = '';
+
+    function flush(prot) { if (cur !== '') { segs.push({ text: cur, prot: prot }); cur = ''; } }
+
+    while (i < line.length) {
+      // Regelcommentaar
+      if (line[i] === '/' && line[i + 1] === '/') {
+        flush(false);
+        segs.push({ text: line.slice(i), prot: true });
+        return segs;
+      }
+      // Verbatim string @"..."
+      if (line[i] === '@' && line[i + 1] === '"') {
+        flush(false);
+        cur = '@"'; i += 2;
+        while (i < line.length) {
+          if (line[i] === '"' && line[i + 1] === '"') { cur += '""'; i += 2; }
+          else if (line[i] === '"') { cur += '"'; i++; break; }
+          else { cur += line[i++]; }
+        }
+        flush(true); continue;
+      }
+      // Interpolated / gewone string
+      if (line[i] === '"') {
+        flush(false);
+        cur = '"'; i++;
+        while (i < line.length) {
+          if (line[i] === '\\') { cur += line[i] + (line[i + 1] || ''); i += 2; }
+          else if (line[i] === '"') { cur += '"'; i++; break; }
+          else { cur += line[i++]; }
+        }
+        flush(true); continue;
+      }
+      // Char literal
+      if (line[i] === '\'') {
+        flush(false);
+        cur = '\''; i++;
+        while (i < line.length) {
+          if (line[i] === '\\') { cur += line[i] + (line[i + 1] || ''); i += 2; }
+          else if (line[i] === '\'') { cur += '\''; i++; break; }
+          else { cur += line[i++]; }
+        }
+        flush(true); continue;
+      }
+      cur += line[i++];
+    }
+    flush(false);
+    return segs;
+  }
+
+  function applySpacing(s) {
+    // Compound assignments eerst (voor enkelvoudige = en < >)
+    s = s.replace(/\s*(\+=|-=|\*=|\/=|%=|&=|\|=|\^=)\s*/g, ' $1 ');
+    // Vergelijkingen en logische operatoren (multi-char eerst)
+    s = s.replace(/\s*(===|!==|==|!=|<=|>=|&&|\|\||\?\?|=>)\s*/g, ' $1 ');
+    // < vergelijking: spatie NA maar niet VOOR (asymmetrisch), of gevolgd door cijfer
+    s = s.replace(/([a-z0-9_)\]])<( )/g, '$1 <$2');
+    s = s.replace(/([a-z0-9_)\]])<([0-9])/g, '$1 < $2');
+    // > vergelijking: gevolgd door cijfer of spatie+cijfer
+    s = s.replace(/([0-9_)\]])>(?!=)(\s)/g, '$1 >$2');
+    s = s.replace(/([0-9_)\]])>([0-9])/g, '$1 > $2');
+    // Enkelvoudige = (niet onderdeel van ander operator)
+    s = s.replace(/([^=!<>+\-*/%&|^])\s*=\s*([^=>])/g, '$1 = $2');
+    // Rekenkundige operatoren (alleen als voorafgegaan door identifier/getal/)/)
+    s = s.replace(/([a-zA-Z0-9_)\]])\s*\+\s*([^+=])/g, '$1 + $2');
+    s = s.replace(/([a-zA-Z0-9_)\]])\s*-\s*([^\-=])/g, '$1 - $2');
+    s = s.replace(/([a-zA-Z0-9_)\]])\s*\*\s*([^=])/g,  '$1 * $2');
+    s = s.replace(/([a-zA-Z0-9_)\]])\s*\/\s*([^/=])/g, '$1 / $2');
+    s = s.replace(/([a-zA-Z0-9_)\]])\s*%\s*([^=])/g,   '$1 % $2');
+    // Komma
+    s = s.replace(/,\s*/g, ', ');
+    // Spatie na keywords
+    s = s.replace(/\b(if|else if|for|foreach|while|switch|catch|using)\s*\(/g, '$1 (');
+    // Eén spatie voor {
+    s = s.replace(/\s*\{/g, ' {').replace(/^\s*\{/, '{');
+    // Meerdere spaties samenvoegen
+    s = s.replace(/ {2,}/g, ' ');
+    return s;
+  }
+
+  function spaceLine(line) {
+    return splitSegments(line)
+      .map(function (seg) { return seg.prot ? seg.text : applySpacing(seg.text); })
+      .join('');
+  }
+
+  function formatCSharp(code) {
+    const TAB = '    ';
+    const lines = code.split('\n').map(function (l) { return l.trimEnd(); });
+    const result = [];
+    let indent = 0;
+
+    for (var i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      if (line === '') { result.push(''); continue; }
+
+      const startsClose = line.startsWith('}');
+      if (startsClose) indent = Math.max(0, indent - 1);
+
+      result.push(TAB.repeat(indent) + spaceLine(line));
+
+      // Netto accolade-delta (skip strings/commentaar)
+      let delta = 0, inStr = false, inChar = false;
+      for (var j = 0; j < line.length; j++) {
+        const c = line[j];
+        if (!inStr && !inChar && c === '/' && line[j + 1] === '/') break;
+        if (c === '"' && !inChar) { inStr  = !inStr;  continue; }
+        if (c === '\'' && !inStr) { inChar = !inChar; continue; }
+        if (inStr || inChar) continue;
+        if (c === '{') delta++;
+        if (c === '}') delta--;
+      }
+
+      if (delta > 0) indent += delta;
+      else if (delta < 0 && !startsClose) indent = Math.max(0, indent + delta);
+    }
+
+    return result.join('\n');
+  }
+
   require(['vs/editor/editor.main'], function () {
+
+    // Registreer formatter voor C#
+    monaco.languages.registerDocumentFormattingEditProvider('csharp', {
+      provideDocumentFormattingEdits: function (model) {
+        return [{ range: model.getFullModelRange(), text: formatCSharp(model.getValue()) }];
+      }
+    });
 
     const editor = monaco.editor.create(document.getElementById('editor-cs'), {
       theme: 'vs-dark',
@@ -38,16 +171,53 @@ class Program
       smoothScrolling: true,
     });
 
-    // ── Output panel ────────────────────────────────────
-    const outputBody  = document.getElementById('output-body');
-    const errorsBody  = document.getElementById('errors-body');
+    // ── Terminal ─────────────────────────────────────────
+    const termOutput  = document.getElementById('terminal-output');
+    const termInput   = document.getElementById('terminal-input');
+    const termStatus  = document.getElementById('terminal-status');
+    const btnRun      = document.getElementById('btn-run');
+    const btnStop     = document.getElementById('btn-stop');
+
+    let ws = null;
+
+    function termAppend(text) {
+      termOutput.textContent += text;
+      termOutput.scrollTop = termOutput.scrollHeight;
+    }
+
+    function termClear() {
+      termOutput.textContent = '';
+    }
+
+    function setStatus(text) {
+      termStatus.textContent = text;
+    }
+
+    let inputPauseTimer = null;
+
+    function setRunning(running) {
+      btnRun.style.display  = running ? 'none' : '';
+      btnStop.style.display = running ? '' : 'none';
+      termInput.disabled    = true; // standaard uitgeschakeld, enkel aan bij pauze
+      if (running) termInput.focus();
+    }
+
+    function scheduleInputEnable() {
+      clearTimeout(inputPauseTimer);
+      termInput.disabled = true;
+      inputPauseTimer = setTimeout(function () {
+        if (ws) {
+          termInput.disabled = false;
+          termInput.focus();
+        }
+      }, 120);
+    }
+
+    // ── Fouten panel ─────────────────────────────────────
     const errorsPanel = document.getElementById('errors-panel');
+    const errorsBody  = document.getElementById('errors-body');
     const errorsBadge = document.getElementById('errors-badge');
     let errorCount = 0;
-
-    function clearOutput() {
-      outputBody.innerHTML = '';
-    }
 
     function clearErrors() {
       errorsBody.innerHTML = '';
@@ -56,17 +226,7 @@ class Program
       errorsBadge.classList.remove('visible');
     }
 
-    function appendOutput(lines) {
-      lines.forEach(function (line) {
-        const el = document.createElement('div');
-        el.className = 'output-line';
-        el.textContent = line;
-        outputBody.appendChild(el);
-      });
-      outputBody.scrollTop = outputBody.scrollHeight;
-    }
-
-    function appendErrors(errors) {
+    function showErrors(errors) {
       errors.forEach(function (err) {
         const entry = document.createElement('div');
         entry.className = 'error-entry' + (err.severity === 'warning' ? ' error-entry--warning' : '');
@@ -83,54 +243,91 @@ class Program
         entry.appendChild(text);
         errorsBody.appendChild(entry);
 
-        if (err.severity !== 'warning') {
-          errorCount++;
-        }
+        if (err.severity !== 'warning') errorCount++;
       });
 
       if (errorCount > 0) {
         errorsBadge.textContent = errorCount;
         errorsBadge.classList.add('visible');
-
-        // Open errors panel als het ingeklapt is
         errorsPanel.classList.remove('is-collapsed');
       }
-
-      errorsBody.scrollTop = errorsBody.scrollHeight;
     }
 
-    // ── Run ──────────────────────────────────────────────
-    const btnRun = document.getElementById('btn-run');
-
-    async function runCode() {
-      if (btnRun.classList.contains('is-running')) return;
+    // ── WebSocket run ─────────────────────────────────────
+    function runCode() {
+      if (ws) return;
 
       const code = editor.getValue();
-      clearOutput();
+      termClear();
       clearErrors();
+      setRunning(true);
+      setStatus('Compileren...');
 
-      btnRun.classList.add('is-running');
-      btnRun.querySelector('span').textContent = 'Bezig...';
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(protocol + '//' + location.host);
 
-      try {
-        const result = await window.CSRunner.runCSharp(code);
+      ws.onopen = function () {
+        ws.send(JSON.stringify({ type: 'start', code: code }));
+      };
 
-        if (result.output && result.output.length > 0) {
-          appendOutput(result.output);
+      ws.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+
+        if (data.type === 'output') {
+          if (termOutput.textContent === '') setStatus('');
+          termAppend(data.data);
+          scheduleInputEnable();
         }
 
-        if (result.errors && result.errors.length > 0) {
-          appendErrors(result.errors);
+        if (data.type === 'clear') {
+          termClear();
         }
-      } catch (e) {
-        appendErrors([{ message: 'Onverwachte fout: ' + e.message, line: 0, col: 0, severity: 'error' }]);
-      } finally {
-        btnRun.classList.remove('is-running');
-        btnRun.querySelector('span').textContent = 'Run';
-      }
+
+        if (data.type === 'exit') {
+          setStatus('');
+          setRunning(false);
+          ws = null;
+          if (data.errors && data.errors.length > 0) {
+            showErrors(data.errors);
+          }
+          if (data.code !== 0 && data.errors && data.errors.length === 0) {
+            termAppend('\n[Programma gestopt met exitcode ' + data.code + ']');
+          }
+        }
+      };
+
+      ws.onclose = function () {
+        setStatus('');
+        setRunning(false);
+        ws = null;
+      };
+
+      ws.onerror = function () {
+        termAppend('\n[Verbindingsfout]');
+        setStatus('');
+        setRunning(false);
+        ws = null;
+      };
     }
 
-    // ── Errors panel toggle ──────────────────────────────
+    function stopCode() {
+      if (ws) ws.send(JSON.stringify({ type: 'stop' }));
+    }
+
+    // ── Terminal invoer ───────────────────────────────────
+    termInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        const val = termInput.value;
+        termInput.value = '';
+        termInput.disabled = true; // wacht op volgende output-pauze
+        termAppend(val + '\n');
+        if (ws) ws.send(JSON.stringify({ type: 'input', data: val }));
+      }
+    });
+
+    document.getElementById('terminal-clear').addEventListener('click', termClear);
+
+    // ── Fouten panel toggle ───────────────────────────────
     document.getElementById('errors-toggle').addEventListener('click', function (e) {
       if (e.target === document.getElementById('errors-clear')) return;
       errorsPanel.classList.toggle('is-collapsed');
@@ -146,77 +343,61 @@ class Program
       clearErrors();
     });
 
-    document.getElementById('output-clear').addEventListener('click', clearOutput);
-
-    // ── Keyboard shortcut Ctrl+Enter = Run ──────────────
-    editor.addCommand(
-      monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-      runCode
-    );
-
-    // ── Layout toggle ────────────────────────────────────
-    const workspace = document.getElementById('workspace');
-
-    document.getElementById('btn-layout').addEventListener('click', function () {
-      workspace.classList.toggle('layout-stacked');
-
-      // Reset inline flex-sizes zodat de layout netjes herverdeelt
-      document.getElementById('editor-panel').style.flex = '';
-      document.getElementById('right-panel').style.flex = '';
-      document.getElementById('output-panel').style.flex = '';
-      document.getElementById('errors-panel').style.flex = '';
-
-      editor.layout();
+    // ── Format ────────────────────────────────────────────
+    document.getElementById('btn-format').addEventListener('click', function () {
+      editor.getAction('editor.action.formatDocument').run();
     });
 
-    // ── Button events ────────────────────────────────────
-    btnRun.addEventListener('click', runCode);
+    // ── Keyboard shortcut ─────────────────────────────────
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runCode);
 
-    // ── Download .cs ─────────────────────────────────────
+    // ── Buttons ───────────────────────────────────────────
+    btnRun.addEventListener('click', runCode);
+    btnStop.addEventListener('click', stopCode);
+
+    // ── Download ──────────────────────────────────────────
     document.getElementById('btn-download').addEventListener('click', function () {
-      const code = editor.getValue();
-      const blob = new Blob([code], { type: 'text/plain' });
+      const blob = new Blob([editor.getValue()], { type: 'text/plain' });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
-      a.href     = url;
-      a.download = 'Program.cs';
-      a.click();
+      a.href = url; a.download = 'Program.cs'; a.click();
       URL.revokeObjectURL(url);
     });
 
-    // ── Upload .cs of .zip ───────────────────────────────
+    // ── Upload ────────────────────────────────────────────
     document.getElementById('input-upload').addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (!file) return;
 
       if (file.name.endsWith('.zip')) {
         JSZip.loadAsync(file).then(function (zip) {
-          // Zoek eerste .cs bestand in de ZIP
           const csFile = Object.values(zip.files).find(f => f.name.endsWith('.cs') && !f.dir);
-          if (!csFile) {
-            alert('Geen .cs bestand gevonden in de ZIP.');
-            return;
-          }
-          csFile.async('string').then(function (content) {
-            editor.setValue(content);
-          });
-        }).catch(function () {
-          alert('Kon de ZIP niet lezen.');
-        });
+          if (!csFile) { alert('Geen .cs bestand gevonden in de ZIP.'); return; }
+          csFile.async('string').then(function (content) { editor.setValue(content); });
+        }).catch(function () { alert('Kon de ZIP niet lezen.'); });
       } else {
         const reader = new FileReader();
-        reader.onload = function (ev) {
-          editor.setValue(ev.target.result);
-        };
+        reader.onload = function (ev) { editor.setValue(ev.target.result); };
         reader.readAsText(file);
       }
-
       e.target.value = '';
     });
 
-    // ── Resizer: editor ↔ right panel ───────────────────
+    // ── Layout toggle ─────────────────────────────────────
+    const workspace = document.getElementById('workspace');
+
+    document.getElementById('btn-layout').addEventListener('click', function () {
+      workspace.classList.toggle('layout-stacked');
+      document.getElementById('editor-panel').style.flex = '';
+      document.getElementById('right-panel').style.flex = '';
+      document.getElementById('terminal-panel').style.flex = '';
+      document.getElementById('errors-panel').style.flex = '';
+      editor.layout();
+    });
+
+    // ── Resizers ──────────────────────────────────────────
     function initResizer(resizerEl, getPanelA, getPanelB, isVerticalFn) {
-      let startPos, startSizeA, startSizeB;
+      let startPos, startSizeA;
 
       resizerEl.addEventListener('mousedown', function (e) {
         e.preventDefault();
@@ -224,7 +405,6 @@ class Program
         const vert = isVerticalFn();
         startPos   = vert ? e.clientY : e.clientX;
         startSizeA = vert ? getPanelA().offsetHeight : getPanelA().offsetWidth;
-        startSizeB = vert ? getPanelB().offsetHeight : getPanelB().offsetWidth;
 
         function onMove(e) {
           const vert  = isVerticalFn();
@@ -233,8 +413,7 @@ class Program
           const total = vert
             ? getPanelA().parentElement.offsetHeight
             : getPanelA().parentElement.offsetWidth;
-          const pct = (newA / total) * 100;
-          getPanelA().style.flex = '0 0 ' + pct + '%';
+          getPanelA().style.flex = '0 0 ' + ((newA / total) * 100) + '%';
           getPanelB().style.flex = '1 1 0';
           editor.layout();
         }
@@ -259,7 +438,7 @@ class Program
 
     initResizer(
       document.getElementById('right-resizer'),
-      function () { return document.getElementById('output-panel'); },
+      function () { return document.getElementById('terminal-panel'); },
       function () { return document.getElementById('errors-panel'); },
       function () { return !workspace.classList.contains('layout-stacked'); }
     );

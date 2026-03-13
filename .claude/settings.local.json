@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd C:/Users/rogie/Desktop/csbox && npm install ws 2>&1 | tail -3)"
+    ]
+  }
+}
