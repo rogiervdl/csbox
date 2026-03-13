@@ -164,7 +164,7 @@ wss.on('connection', function (ws) {
         .replace(/Console\.ReadKey\s*\(\s*(?:true|false)?\s*\)/g, 'CsBoxIO.ReadKey()');
       fs.writeFileSync(path.join(tmpDir, 'Program.cs'), safeCode, 'utf8');
 
-      proc = spawn('dotnet', ['run', '--project', tmpDir, '--no-launch-profile'], {
+      proc = spawn('dotnet', ['run', '--project', tmpDir, '--no-launch-profile', '--verbosity', 'quiet'], {
         cwd: tmpDir,
         env: { ...process.env, DOTNET_NOLOGO: '1', DOTNET_CLI_TELEMETRY_OPTOUT: '1',
                DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: '1', TERM: 'xterm-256color' },
@@ -187,6 +187,7 @@ wss.on('connection', function (ws) {
 
       proc.stdout.on('data', (chunk) => {
         outBuf += chunk.toString()
+          .replace(/^[^\n]*\.cs\s*\(\d+,\d+\)\s*:\s*(error|warning)\s+CS\d+[^\n]*\n?/gm, '')
           .replace(ANSI_NON_SGR_RE, '')
           .replace(/\r\n/g, '\n')
           .replace(/\r/g, '\n');
@@ -215,13 +216,20 @@ wss.on('connection', function (ws) {
         if (toSend) { send({ type: 'output', data: toSend }); outBuf = outBuf.slice(toSend.length); }
       });
 
+      const errorRe = /^.*\.cs\((\d+),(\d+)\):\s*(error|warning)\s+\S+:\s*(.+)$/;
       let stderr = '';
-      proc.stderr.on('data', (chunk) => { stderr += chunk.toString(); });
+      proc.stderr.on('data', (chunk) => {
+        const text = chunk.toString();
+        stderr += text;
+        // Stuur warnings/errors real-time naar de terminal als build-bericht
+        for (const raw of text.split('\n')) {
+          const line = raw.replace(/\r$/, '');
+          if (errorRe.test(line)) send({ type: 'build', data: line + '\n' });
+        }
+      });
 
       proc.on('close', (code) => {
-        // Filter compilatiefouten uit stderr
         const errors = [];
-        const errorRe = /^.*\.cs\((\d+),(\d+)\):\s*(error|warning)\s+\S+:\s*(.+)$/;
         const seen = new Set();
         for (const line of stderr.split('\n')) {
           const m = line.replace(/\r$/, '').match(errorRe);

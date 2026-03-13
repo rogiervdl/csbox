@@ -289,6 +289,8 @@ class Program
       clearErrors();
       setRunning(true);
       setStatus('Compileren...');
+      let firstOutput = true;
+      let hadBuildOutput = false;
 
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
       ws = new WebSocket(protocol + '//' + location.host);
@@ -300,8 +302,14 @@ class Program
       ws.onmessage = function (e) {
         const data = JSON.parse(e.data);
 
+        if (data.type === 'build') {
+          hadBuildOutput = true;
+          setStatus('');
+          termAppend(data.data);
+        }
+
         if (data.type === 'output') {
-          if (termOutput.textContent === '') setStatus('');
+          if (firstOutput) { firstOutput = false; setStatus(''); if (hadBuildOutput) termAppend('\n\n'); }
           termAppend(data.data);
           scheduleInputEnable();
         }
