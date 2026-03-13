@@ -1,5 +1,5 @@
 /* =====================================================
-   CSBox — Dark theme layout
+   CSBox — layout + theme tokens
    ===================================================== */
 
 *, *::before, *::after {
@@ -8,21 +8,67 @@
   padding: 0;
 }
 
+/* ── Dark theme (standaard) ───────────────────────── */
 :root {
-  --bg-base:       #1e1e1e;
-  --bg-toolbar:    #252526;
-  --bg-pane:       #1e1e1e;
-  --bg-header:     #2d2d30;
-  --border:        #3e3e42;
-  --text-primary:  #cccccc;
-  --text-muted:    #858585;
-  --accent-run:    #0e7a3d;
-  --accent-run-h:  #11a050;
-  --accent-dl:     #2b5797;
-  --accent-dl-h:   #3a6ec0;
-  --accent-cs:     #512bd4;
-  --resizer-w:     5px;
-  --toolbar-h:     44px;
+  --bg-base:        #1e1e1e;
+  --bg-toolbar:     #252526;
+  --bg-header:      #2d2d30;
+  --bg-terminal:    #0d0d0d;
+  --border:         #3e3e42;
+  --text-primary:   #cccccc;
+  --text-muted:     #858585;
+  --text-code:      #cccccc;
+  --text-title:     #d4d4d4;
+  --btn-bg:         #3c3c3c;
+  --btn-bg-h:       #4a4a4a;
+  --btn-text:       #ffffff;
+  --btn-collapse-h: #3e3e42;
+  --input-border:   #1e1e1e;
+  --placeholder:    #444;
+  --error-color:    #f47067;
+  --error-bg:       #1a0808;
+  --error-border:   #2a1010;
+  --warn-color:     #e5c07b;
+  --warn-bg:        #1a1400;
+  --warn-border:    #2a2000;
+  --scrollbar-bg:   #1e1e1e;
+  --scrollbar-thumb:#555;
+  --scrollbar-h:    #777;
+  --accent-run:     #0e7a3d;
+  --accent-run-h:   #11a050;
+  --accent-dl:      #2b5797;
+  --accent-dl-h:    #3a6ec0;
+  --accent-cs:      #512bd4;
+  --resizer-w:      5px;
+  --toolbar-h:      44px;
+}
+
+/* ── Light theme ──────────────────────────────────── */
+body.theme-light {
+  --bg-base:        #f3f3f3;
+  --bg-toolbar:     #e8e8e8;
+  --bg-header:      #dddddd;
+  --bg-terminal:    #ffffff;
+  --border:         #c8c8c8;
+  --text-primary:   #333333;
+  --text-muted:     #777777;
+  --text-code:      #1e1e1e;
+  --text-title:     #333333;
+  --btn-bg:         #d8d8d8;
+  --btn-bg-h:       #c4c4c4;
+  --btn-text:       #1e1e1e;
+  --btn-collapse-h: #cccccc;
+  --input-border:   #d8d8d8;
+  --placeholder:    #aaaaaa;
+  --error-color:    #c0392b;
+  --error-bg:       #fff0f0;
+  --error-border:   #ffc8c8;
+  --warn-color:     #7a5500;
+  --warn-bg:        #fffbec;
+  --warn-border:    #ffe080;
+  --scrollbar-bg:   #f3f3f3;
+  --scrollbar-thumb:#bbbbbb;
+  --scrollbar-h:    #999999;
 }
 
 html, body {
@@ -62,7 +108,7 @@ html, body {
 .toolbar__title {
   font-size: 15px;
   font-weight: 600;
-  color: #d4d4d4;
+  color: var(--text-title);
   letter-spacing: 0.5px;
 }
 
@@ -84,8 +130,8 @@ html, body {
   font-size: 12px;
   font-weight: 500;
   transition: background 0.15s, opacity 0.15s;
-  color: #ffffff;
-  background: #3c3c3c;
+  color: var(--btn-text);
+  background: var(--btn-bg);
   white-space: nowrap;
 }
 
@@ -95,10 +141,10 @@ html, body {
   flex-shrink: 0;
 }
 
-.btn:hover { background: #4a4a4a; }
+.btn:hover { background: var(--btn-bg-h); }
 .btn:active { opacity: 0.8; }
 
-.btn--primary { background: var(--accent-run); }
+.btn--primary { background: var(--accent-run); color: #ffffff; }
 .btn--primary:hover { background: var(--accent-run-h); }
 
 .btn--primary.is-running {
@@ -107,11 +153,15 @@ html, body {
   opacity: 0.7;
 }
 
-.btn--secondary { background: var(--accent-dl); }
+.btn--secondary { background: var(--accent-dl); color: #ffffff; }
 .btn--secondary:hover { background: var(--accent-dl-h); }
 
-/* ── Buttons ──────────────────────────────────────── */
 .btn--icon { color: var(--text-primary); }
+
+/* ── Theme toggle iconen ──────────────────────────── */
+.icon-moon { display: none; }
+body.theme-light .icon-sun  { display: none; }
+body.theme-light .icon-moon { display: inline; }
 
 /* ── Workspace ────────────────────────────────────── */
 .workspace {
@@ -220,7 +270,7 @@ html, body {
   flex: 1 1 0;
   min-height: 80px;
   overflow: hidden;
-  background: #0d0d0d;
+  background: var(--bg-terminal);
 }
 
 .output-body {
@@ -231,7 +281,7 @@ html, body {
   padding: 8px 12px;
   white-space: pre-wrap;
   word-break: break-all;
-  color: #cccccc;
+  color: var(--text-code);
 }
 
 .output-line {
@@ -245,7 +295,7 @@ html, body {
   flex: 0 0 180px;
   min-height: 30px;
   border-top: 1px solid var(--border);
-  background: #0d0d0d;
+  background: var(--bg-terminal);
   overflow: hidden;
   transition: flex-basis 0.2s;
 }
@@ -276,17 +326,17 @@ html, body {
   align-items: baseline;
   gap: 8px;
   padding: 2px 12px;
-  color: #f47067;
-  background: #1a0808;
-  border-bottom: 1px solid #2a1010;
+  color: var(--error-color);
+  background: var(--error-bg);
+  border-bottom: 1px solid var(--error-border);
   white-space: pre-wrap;
   word-break: break-all;
 }
 
 .error-entry--warning {
-  color: #e5c07b;
-  background: #1a1400;
-  border-bottom-color: #2a2000;
+  color: var(--warn-color);
+  background: var(--warn-bg);
+  border-bottom-color: var(--warn-border);
 }
 
 .error-entry__location {
@@ -335,7 +385,7 @@ html, body {
 
 .btn-collapse:hover {
   color: var(--text-primary);
-  background: #3e3e42;
+  background: var(--btn-collapse-h);
 }
 
 .btn-collapse svg {
@@ -349,14 +399,14 @@ html, body {
   padding: 2px 7px;
   font-size: 10px;
   font-weight: 500;
-  background: #3c3c3c;
+  background: var(--btn-bg);
   color: var(--text-muted);
   border: none;
   border-radius: 3px;
   cursor: pointer;
   flex-shrink: 0;
 }
-.console-clear-btn:hover { background: #4a4a4a; color: var(--text-primary); }
+.console-clear-btn:hover { background: var(--btn-bg-h); color: var(--text-primary); }
 
 /* ── Resizers ─────────────────────────────────────── */
 .resizer {
@@ -396,7 +446,7 @@ html, body {
   flex: 1 1 0;
   min-height: 80px;
   overflow: hidden;
-  background: #0d0d0d;
+  background: var(--bg-terminal);
 }
 
 .terminal-status {
@@ -415,7 +465,7 @@ html, body {
   line-height: 1.6;
   padding: 8px 12px;
   margin: 0;
-  color: #cccccc;
+  color: var(--text-code);
   white-space: pre-wrap;
   word-break: break-all;
 }
@@ -425,7 +475,7 @@ html, body {
   align-items: center;
   gap: 6px;
   padding: 4px 12px 6px;
-  border-top: 1px solid #1e1e1e;
+  border-top: 1px solid var(--input-border);
   flex-shrink: 0;
 }
 
@@ -442,7 +492,7 @@ html, body {
   background: transparent;
   border: none;
   outline: none;
-  color: #cccccc;
+  color: var(--text-code);
   font-family: 'Consolas', 'Courier New', monospace;
   font-size: 13px;
   caret-color: var(--accent-cs);
@@ -454,12 +504,13 @@ html, body {
 }
 
 .terminal-input::placeholder {
-  color: #444;
+  color: var(--placeholder);
 }
 
 /* ── Stop button ──────────────────────────────────── */
 .btn--stop {
   background: #7a1a1a;
+  color: #ffffff;
 }
 .btn--stop:hover { background: #a02020; }
 
@@ -470,7 +521,7 @@ html, body {
   flex: 0 0 120px;
   min-height: 30px;
   border-top: 1px solid var(--border);
-  background: #0d0d0d;
+  background: var(--bg-terminal);
   overflow: hidden;
   transition: flex-basis 0.2s;
 }
@@ -497,8 +548,8 @@ html, body {
 .input-body {
   flex: 1;
   resize: none;
-  background: #0d0d0d;
-  color: #cccccc;
+  background: var(--bg-terminal);
+  color: var(--text-code);
   border: none;
   outline: none;
   font-family: 'Consolas', 'Courier New', monospace;
@@ -509,11 +560,11 @@ html, body {
 }
 
 .input-body::placeholder {
-  color: #444;
+  color: var(--placeholder);
 }
 
 /* ── Scrollbar ────────────────────────────────────── */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #777; }
+::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-h); }

@@ -186,11 +186,17 @@ wss.on('connection', function (ws) {
       }
 
       proc.stdout.on('data', (chunk) => {
-        outBuf += chunk.toString()
-          .replace(/^[^\n]*\.cs\s*\(\d+,\d+\)\s*:\s*(error|warning)\s+CS\d+[^\n]*\n?/gm, '')
-          .replace(ANSI_RE, '')
-          .replace(/\r\n/g, '\n')
-          .replace(/\r/g, '\n');
+        const raw = chunk.toString().replace(ANSI_RE, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        // CS-fout/waarschuwingsregels in stdout: doorsturen als build-bericht + toevoegen aan stderr-buffer
+        const clean = raw.split('\n').filter(line => {
+          if (errorRe.test(line)) {
+            send({ type: 'build', data: line + '\n' });
+            stderr += line + '\n';
+            return false;
+          }
+          return true;
+        }).join('\n');
+        outBuf += clean;
 
         // Verwerk alle volledige sentinels
         let m;

@@ -444,6 +444,20 @@ class Program
       e.target.value = '';
     });
 
+    // ── Thema toggle ──────────────────────────────────────
+    (function () {
+      const saved = localStorage.getItem('csbox-theme');
+      if (saved === 'light') {
+        document.body.classList.add('theme-light');
+        monaco.editor.setTheme('vs');
+      }
+      document.getElementById('btn-theme').addEventListener('click', function () {
+        const light = document.body.classList.toggle('theme-light');
+        monaco.editor.setTheme(light ? 'vs' : 'vs-dark');
+        localStorage.setItem('csbox-theme', light ? 'light' : 'dark');
+      });
+    })();
+
     // ── Layout toggle ─────────────────────────────────────
     const workspace = document.getElementById('workspace');
 
