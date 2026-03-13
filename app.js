@@ -32,8 +32,8 @@ const HELPER_CS = `internal static class CsBoxIO {
     }
 }`;
 
-// Strip non-color ANSI sequences from output
-const ANSI_NON_SGR_RE = /\x1B(?:\[(?![0-9;]*m)[0-9;]*[a-zA-Z]|[^[])/g;
+// Strip alle ANSI escape sequences uit de output (kleuren lopen via sentinels)
+const ANSI_RE = /\x1B(?:\[[0-9;]*[a-zA-Z]|[^[])/g;
 
 // ConsoleColor → ANSI SGR codes (mirrors .NET's Unix mapping)
 const CONSOLE_COLOR_FG = {
@@ -188,7 +188,7 @@ wss.on('connection', function (ws) {
       proc.stdout.on('data', (chunk) => {
         outBuf += chunk.toString()
           .replace(/^[^\n]*\.cs\s*\(\d+,\d+\)\s*:\s*(error|warning)\s+CS\d+[^\n]*\n?/gm, '')
-          .replace(ANSI_NON_SGR_RE, '')
+          .replace(ANSI_RE, '')
           .replace(/\r\n/g, '\n')
           .replace(/\r/g, '\n');
 
