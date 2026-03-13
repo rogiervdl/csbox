@@ -20,6 +20,20 @@ class Program
     }
 }`;
 
+  // ── ANSI color tables (SGR codes) ────────────────────
+  const ANSI_FG = {
+    30:'#555',   31:'#cd3131', 32:'#0dbc79', 33:'#e5e510',
+    34:'#2472c8',35:'#bc3fbc', 36:'#11a8cd', 37:'#e5e5e5',
+    90:'#666',   91:'#f14c4c', 92:'#23d18b', 93:'#f5f543',
+    94:'#3b8eea',95:'#d670d6', 96:'#29b8db', 97:'#ffffff',
+  };
+  const ANSI_BG = {
+    40:'#555',   41:'#cd3131', 42:'#0dbc79', 43:'#e5e510',
+    44:'#2472c8',45:'#bc3fbc', 46:'#11a8cd', 47:'#e5e5e5',
+   100:'#666',  101:'#f14c4c',102:'#23d18b',103:'#f5f543',
+   104:'#3b8eea',105:'#d670d6',106:'#29b8db',107:'#ffffff',
+  };
+
   // ── C# formatter ─────────────────────────────────────
 
   // Splits een regel in segmenten: {text, protected}
@@ -179,14 +193,27 @@ class Program
     const btnStop     = document.getElementById('btn-stop');
 
     let ws = null;
+    let readKeyMode = false;
+
+    // ── ANSI rendering ────────────────────────────────
+    let ansiState = { fg: null, bg: null };
 
     function termAppend(text) {
-      termOutput.textContent += text;
+      if (ansiState.fg || ansiState.bg) {
+        const span = document.createElement('span');
+        if (ansiState.fg) span.style.color = ansiState.fg;
+        if (ansiState.bg) span.style.backgroundColor = ansiState.bg;
+        span.textContent = text;
+        termOutput.appendChild(span);
+      } else {
+        termOutput.appendChild(document.createTextNode(text));
+      }
       termOutput.scrollTop = termOutput.scrollHeight;
     }
 
     function termClear() {
       termOutput.textContent = '';
+      ansiState = { fg: null, bg: null };
     }
 
     function setStatus(text) {
@@ -279,11 +306,26 @@ class Program
           scheduleInputEnable();
         }
 
+        if (data.type === 'readkey') {
+          clearTimeout(inputPauseTimer);
+          readKeyMode = true;
+          termInput.value = '';
+          termInput.disabled = false;
+          termInput.focus();
+        }
+
+        if (data.type === 'color') {
+          if ('fg' in data) ansiState.fg = data.fg !== null ? ANSI_FG[data.fg] : null;
+          if ('bg' in data) ansiState.bg = data.bg !== null ? ANSI_BG[data.bg] : null;
+        }
+
         if (data.type === 'clear') {
           termClear();
         }
 
         if (data.type === 'exit') {
+          ansiState = { fg: null, bg: null };
+          readKeyMode = false;
           setStatus('');
           setRunning(false);
           ws = null;
@@ -316,12 +358,23 @@ class Program
 
     // ── Terminal invoer ───────────────────────────────────
     termInput.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        const val = termInput.value;
+      if (readKeyMode && e.key.length === 1) {
+        // Één toets sturen zonder Enter
+        e.preventDefault();
+        readKeyMode = false;
+        const val = e.key;
         termInput.value = '';
-        termInput.disabled = true; // wacht op volgende output-pauze
         termAppend(val + '\n');
         if (ws) ws.send(JSON.stringify({ type: 'input', data: val }));
+        scheduleInputEnable();
+        return;
+      }
+      if (e.key === 'Enter' && !readKeyMode) {
+        const val = termInput.value;
+        termInput.value = '';
+        termAppend(val + '\n');
+        if (ws) ws.send(JSON.stringify({ type: 'input', data: val }));
+        scheduleInputEnable();
       }
     });
 

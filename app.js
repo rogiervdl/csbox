@@ -19,7 +19,35 @@ const CSPROJ = `<Project Sdk="Microsoft.NET.Sdk">
   </PropertyGroup>
 </Project>`;
 
-const ANSI_RE = /\x1B\[[0-9;]*[a-zA-Z]/g;
+// Hulpklasse voor Console.ReadKey() — werkt niet met omgeleide stdin
+const HELPER_CS = `internal static class CsBoxIO {
+    public static System.ConsoleKeyInfo ReadKey(bool intercept = false) {
+        System.Console.Write("__CSBOX_RK__");
+        string line = System.Console.ReadLine() ?? string.Empty;
+        char ch = line.Length > 0 ? line[0] : '\\0';
+        System.ConsoleKey key = ch >= 'a' && ch <= 'z'
+            ? (System.ConsoleKey)System.Char.ToUpper(ch)
+            : (System.ConsoleKey)ch;
+        return new System.ConsoleKeyInfo(ch, key, System.Char.IsUpper(ch), false, false);
+    }
+}`;
+
+// Strip non-color ANSI sequences from output
+const ANSI_NON_SGR_RE = /\x1B(?:\[(?![0-9;]*m)[0-9;]*[a-zA-Z]|[^[])/g;
+
+// ConsoleColor → ANSI SGR codes (mirrors .NET's Unix mapping)
+const CONSOLE_COLOR_FG = {
+  Black:30, DarkRed:31, DarkGreen:32, DarkYellow:33,
+  DarkBlue:34, DarkMagenta:35, DarkCyan:36, Gray:37,
+  DarkGray:90, Red:91, Green:92, Yellow:93,
+  Blue:94, Magenta:95, Cyan:96, White:97,
+};
+const CONSOLE_COLOR_BG = {
+  Black:40, DarkRed:41, DarkGreen:42, DarkYellow:43,
+  DarkBlue:44, DarkMagenta:45, DarkCyan:46, Gray:47,
+  DarkGray:100, Red:101, Green:102, Yellow:103,
+  Blue:104, Magenta:105, Cyan:106, White:107,
+};
 
 // ── Persistente Roslyn runner (voor batch /api/run) ───
 let runnerProc  = null;
@@ -125,36 +153,62 @@ wss.on('connection', function (ws) {
       tmpDir = path.join(os.tmpdir(), 'csbox-' + id);
       fs.mkdirSync(tmpDir, { recursive: true });
       fs.writeFileSync(path.join(tmpDir, 'csbox.csproj'), CSPROJ, 'utf8');
+      fs.writeFileSync(path.join(tmpDir, 'CsBoxHelper.cs'), HELPER_CS, 'utf8');
       const safeCode = (data.code || '')
-        .replace(/Console\.Clear\s*\(\s*\)/g, 'Console.WriteLine("__CSBOX_CLEAR__")');
+        .replace(/Console\.Clear\s*\(\s*\)/g,       'Console.Write("__CSBOX_CLEAR__")')
+        .replace(/Console\.ForegroundColor\s*=\s*ConsoleColor\.(\w+)\s*;/g,
+          (_, c) => `Console.Write("__CSBOX_FG:${CONSOLE_COLOR_FG[c] ?? 0}__");`)
+        .replace(/Console\.BackgroundColor\s*=\s*ConsoleColor\.(\w+)\s*;/g,
+          (_, c) => `Console.Write("__CSBOX_BG:${CONSOLE_COLOR_BG[c] ?? 0}__");`)
+        .replace(/Console\.ResetColor\s*\(\s*\)\s*;/g, 'Console.Write("__CSBOX_RS__");')
+        .replace(/Console\.ReadKey\s*\(\s*(?:true|false)?\s*\)/g, 'CsBoxIO.ReadKey()');
       fs.writeFileSync(path.join(tmpDir, 'Program.cs'), safeCode, 'utf8');
 
       proc = spawn('dotnet', ['run', '--project', tmpDir, '--no-launch-profile'], {
         cwd: tmpDir,
-        env: { ...process.env, DOTNET_NOLOGO: '1', DOTNET_CLI_TELEMETRY_OPTOUT: '1' },
+        env: { ...process.env, DOTNET_NOLOGO: '1', DOTNET_CLI_TELEMETRY_OPTOUT: '1',
+               DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: '1', TERM: 'xterm-256color' },
       });
 
-      const SENTINEL = '__CSBOX_CLEAR__\n';
+      // Alle sentinels beginnen met __CSBOX_
+      const CSBOX_RE  = /__CSBOX_(CLEAR|RS|RK|FG:\d+|BG:\d+)__/;
+      const CSBOX_PFX = '__CSBOX_';
+      const CSBOX_MAX = '__CSBOX_BG:100__'.length;
       let outBuf = '';
+
+      function handleSentinel(tag) {
+        if (tag === 'CLEAR') { send({ type: 'clear' }); return; }
+        if (tag === 'RS')    { send({ type: 'color', fg: null, bg: null }); return; }
+        if (tag === 'RK')    { send({ type: 'readkey' }); return; }
+        const [ch, code] = tag.split(':');
+        if (ch === 'FG') send({ type: 'color', fg: +code });
+        if (ch === 'BG') send({ type: 'color', bg: +code });
+      }
 
       proc.stdout.on('data', (chunk) => {
         outBuf += chunk.toString()
-          .replace(ANSI_RE, '')
+          .replace(ANSI_NON_SGR_RE, '')
           .replace(/\r\n/g, '\n')
           .replace(/\r/g, '\n');
 
-        // Verwerk volledige sentinels
-        let idx;
-        while ((idx = outBuf.indexOf(SENTINEL)) !== -1) {
-          if (idx > 0) send({ type: 'output', data: outBuf.slice(0, idx) });
-          send({ type: 'clear' });
-          outBuf = outBuf.slice(idx + SENTINEL.length);
+        // Verwerk alle volledige sentinels
+        let m;
+        while ((m = CSBOX_RE.exec(outBuf)) !== null) {
+          if (m.index > 0) send({ type: 'output', data: outBuf.slice(0, m.index) });
+          handleSentinel(m[1]);
+          outBuf = outBuf.slice(m.index + m[0].length);
+          CSBOX_RE.lastIndex = 0;
         }
 
         // Houd het einde vast als het het begin van een sentinel kan zijn
         let hold = 0;
-        for (let len = Math.min(outBuf.length, SENTINEL.length - 1); len > 0; len--) {
-          if (outBuf.endsWith(SENTINEL.slice(0, len))) { hold = len; break; }
+        const p = outBuf.lastIndexOf(CSBOX_PFX);
+        if (p !== -1 && p + CSBOX_MAX >= outBuf.length) {
+          hold = outBuf.length - p;
+        } else {
+          for (let len = Math.min(outBuf.length, CSBOX_PFX.length - 1); len > 0; len--) {
+            if (outBuf.endsWith(CSBOX_PFX.slice(0, len))) { hold = len; break; }
+          }
         }
 
         const toSend = outBuf.slice(0, outBuf.length - hold);
