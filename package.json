@@ -5,12 +5,12 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "setup": "node scripts/copy-vendor.js"
+    "setup": "node scripts/copy-vendor.js",
+    "build:wasm": "dotnet publish wasm-host/ -c Release"
   },
   "dependencies": {
     "express": "^4.18.2",
     "jszip": "^3.10.1",
-    "monaco-editor": "^0.45.0",
-    "ws": "^8.19.0"
+    "monaco-editor": "^0.45.0"
   }
 }

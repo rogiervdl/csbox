@@ -36,8 +36,6 @@ class Program
 
   // ── C# formatter ─────────────────────────────────────
 
-  // Splits een regel in segmenten: {text, protected}
-  // protected = true voor strings, char literals en commentaar (niet aanpassen)
   function splitSegments(line) {
     const segs = [];
     let i = 0, cur = '';
@@ -45,13 +43,11 @@ class Program
     function flush(prot) { if (cur !== '') { segs.push({ text: cur, prot: prot }); cur = ''; } }
 
     while (i < line.length) {
-      // Regelcommentaar
       if (line[i] === '/' && line[i + 1] === '/') {
         flush(false);
         segs.push({ text: line.slice(i), prot: true });
         return segs;
       }
-      // Verbatim string @"..."
       if (line[i] === '@' && line[i + 1] === '"') {
         flush(false);
         cur = '@"'; i += 2;
@@ -62,7 +58,6 @@ class Program
         }
         flush(true); continue;
       }
-      // Interpolated / gewone string
       if (line[i] === '"') {
         flush(false);
         cur = '"'; i++;
@@ -73,7 +68,6 @@ class Program
         }
         flush(true); continue;
       }
-      // Char literal
       if (line[i] === '\'') {
         flush(false);
         cur = '\''; i++;
@@ -91,31 +85,21 @@ class Program
   }
 
   function applySpacing(s) {
-    // Compound assignments eerst (voor enkelvoudige = en < >)
     s = s.replace(/\s*(\+=|-=|\*=|\/=|%=|&=|\|=|\^=)\s*/g, ' $1 ');
-    // Vergelijkingen en logische operatoren (multi-char eerst)
     s = s.replace(/\s*(===|!==|==|!=|<=|>=|&&|\|\||\?\?|=>)\s*/g, ' $1 ');
-    // < vergelijking: spatie NA maar niet VOOR (asymmetrisch), of gevolgd door cijfer
     s = s.replace(/([a-z0-9_)\]])<( )/g, '$1 <$2');
     s = s.replace(/([a-z0-9_)\]])<([0-9])/g, '$1 < $2');
-    // > vergelijking: gevolgd door cijfer of spatie+cijfer
     s = s.replace(/([0-9_)\]])>(?!=)(\s)/g, '$1 >$2');
     s = s.replace(/([0-9_)\]])>([0-9])/g, '$1 > $2');
-    // Enkelvoudige = (niet onderdeel van ander operator)
     s = s.replace(/([^=!<>+\-*/%&|^])\s*=\s*([^=>])/g, '$1 = $2');
-    // Rekenkundige operatoren (alleen als voorafgegaan door identifier/getal/)/)
     s = s.replace(/([a-zA-Z0-9_)\]])\s*\+\s*([^+=])/g, '$1 + $2');
     s = s.replace(/([a-zA-Z0-9_)\]])\s*-\s*([^\-=])/g, '$1 - $2');
     s = s.replace(/([a-zA-Z0-9_)\]])\s*\*\s*([^=])/g,  '$1 * $2');
     s = s.replace(/([a-zA-Z0-9_)\]])\s*\/\s*([^/=])/g, '$1 / $2');
     s = s.replace(/([a-zA-Z0-9_)\]])\s*%\s*([^=])/g,   '$1 % $2');
-    // Komma
     s = s.replace(/,\s*/g, ', ');
-    // Spatie na keywords
     s = s.replace(/\b(if|else if|for|foreach|while|switch|catch|using)\s*\(/g, '$1 (');
-    // Eén spatie voor {
     s = s.replace(/\s*\{/g, ' {').replace(/^\s*\{/, '{');
-    // Meerdere spaties samenvoegen
     s = s.replace(/ {2,}/g, ' ');
     return s;
   }
@@ -142,7 +126,6 @@ class Program
 
       result.push(TAB.repeat(indent) + spaceLine(line));
 
-      // Netto accolade-delta (skip strings/commentaar)
       let delta = 0, inStr = false, inChar = false;
       for (var j = 0; j < line.length; j++) {
         const c = line[j];
@@ -163,7 +146,6 @@ class Program
 
   require(['vs/editor/editor.main'], function () {
 
-    // Registreer formatter voor C#
     monaco.languages.registerDocumentFormattingEditProvider('csharp', {
       provideDocumentFormattingEdits: function (model) {
         return [{ range: model.getFullModelRange(), text: formatCSharp(model.getValue()) }];
@@ -192,10 +174,92 @@ class Program
     const btnRun      = document.getElementById('btn-run');
     const btnStop     = document.getElementById('btn-stop');
 
-    let ws = null;
+    // ── WASM setup (main thread) ────────────────────────
+    // De .NET runtime draait op de browser main thread zodat
+    // WasmEnableThreads werkt. Student-code draait op een
+    // thread pool thread (Task.Run); blocking via SemaphoreSlim.
+
+    let wasmExports = null;
+    let wasmReady   = false;
+    let running     = false;
     let readKeyMode = false;
 
-    // ── ANSI rendering ────────────────────────────────
+    const csboxInterop = {
+      sendOutput(text) {
+        handleOutput(text);
+      },
+      notifyInputNeeded(mode) {
+        readKeyMode = (mode === 'key');
+        scheduleInputEnable();
+      },
+      sendDone(exitCode) {
+        ansiState = { fg: null, bg: null };
+        readKeyMode = false;
+        setStatus('');
+        setRunning(false);
+        running = false;
+        if (exitCode !== 0 && exitCode !== -1) {
+          termAppend('\n[Programma gestopt met exitcode ' + exitCode + ']');
+        }
+      },
+      sendError(message) {
+        termAppend('\n[Fout: ' + message + ']');
+      },
+    };
+
+    (async function initWasm() {
+      try {
+        const { dotnet } = await import('/wasm-dist/dotnet.js');
+        const runtime = await dotnet.create();
+        runtime.setModuleImports('csbox-interop', csboxInterop);
+        wasmExports = await runtime.getAssemblyExports('wasm-host');
+        wasmReady = true;
+      } catch (err) {
+        termAppend('[WASM laad-fout: ' + (err?.message ?? err) + ']');
+      }
+    })();
+
+    // ── Output parsing (sentinels voor kleur/clear) ────
+    const CSBOX_RE  = /__CSBOX_(CLEAR|RS|FG:\d+|BG:\d+)__/;
+    const CSBOX_PFX = '__CSBOX_';
+    const CSBOX_MAX = '__CSBOX_BG:100__'.length;
+    let outBuf = '';
+
+    function handleOutput(raw) {
+      const text = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      outBuf += text;
+
+      let m;
+      while ((m = CSBOX_RE.exec(outBuf)) !== null) {
+        if (m.index > 0) termAppend(outBuf.slice(0, m.index));
+        handleSentinel(m[1]);
+        outBuf = outBuf.slice(m.index + m[0].length);
+        CSBOX_RE.lastIndex = 0;
+      }
+
+      let hold = 0;
+      const p = outBuf.lastIndexOf(CSBOX_PFX);
+      if (p !== -1 && p + CSBOX_MAX >= outBuf.length) {
+        hold = outBuf.length - p;
+      } else {
+        for (let len = Math.min(outBuf.length, CSBOX_PFX.length - 1); len > 0; len--) {
+          if (outBuf.endsWith(CSBOX_PFX.slice(0, len))) { hold = len; break; }
+        }
+      }
+
+      const toSend = outBuf.slice(0, outBuf.length - hold);
+      if (toSend) { termAppend(toSend); outBuf = outBuf.slice(toSend.length); }
+    }
+
+    function handleSentinel(tag) {
+      if (tag === 'CLEAR') { termClear(); return; }
+      if (tag === 'RS')    { ansiState = { fg: null, bg: null }; return; }
+      const [ch, code] = tag.split(':');
+      if (ch === 'FG') ansiState.fg = ANSI_FG[+code] ?? null;
+      if (ch === 'BG') ansiState.bg = ANSI_BG[+code] ?? null;
+    }
+
+    // ── ANSI rendering ──────────────────────────────────
     let ansiState = { fg: null, bg: null };
 
     function termAppend(text) {
@@ -216,24 +280,22 @@ class Program
       ansiState = { fg: null, bg: null };
     }
 
-    function setStatus(text) {
-      termStatus.textContent = text;
-    }
+    function setStatus(text) { termStatus.textContent = text; }
 
     let inputPauseTimer = null;
 
-    function setRunning(running) {
-      btnRun.style.display  = running ? 'none' : '';
-      btnStop.style.display = running ? '' : 'none';
-      termInput.disabled    = true; // standaard uitgeschakeld, enkel aan bij pauze
-      if (running) termInput.focus();
+    function setRunning(isRunning) {
+      btnRun.style.display  = isRunning ? 'none' : '';
+      btnStop.style.display = isRunning ? '' : 'none';
+      termInput.disabled    = true;
+      if (isRunning) termInput.focus();
     }
 
     function scheduleInputEnable() {
       clearTimeout(inputPauseTimer);
       termInput.disabled = true;
       inputPauseTimer = setTimeout(function () {
-        if (ws) {
+        if (running) {
           termInput.disabled = false;
           termInput.focus();
         }
@@ -280,100 +342,95 @@ class Program
       }
     }
 
-    // ── WebSocket run ─────────────────────────────────────
-    function runCode() {
-      if (ws) return;
+    // ── Run via WASM ──────────────────────────────────────
+    async function runCode() {
+      if (running) return;
 
       const code = editor.getValue();
       termClear();
       clearErrors();
+      outBuf = '';
       setRunning(true);
+      running = true;
       setStatus('Compileren...');
-      let firstOutput = true;
-      let hadBuildOutput = false;
 
-      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      ws = new WebSocket(protocol + '//' + location.host);
-
-      ws.onopen = function () {
-        ws.send(JSON.stringify({ type: 'start', code: code }));
-      };
-
-      ws.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-
-        if (data.type === 'build') {
-          hadBuildOutput = true;
-          setStatus('');
-          termAppend(data.data);
-        }
-
-        if (data.type === 'output') {
-          if (firstOutput) { firstOutput = false; setStatus(''); if (hadBuildOutput) termAppend('\n\n'); }
-          termAppend(data.data);
-          scheduleInputEnable();
-        }
-
-        if (data.type === 'readkey') {
-          clearTimeout(inputPauseTimer);
-          readKeyMode = true;
-          termInput.value = '';
-          termInput.disabled = false;
-          termInput.focus();
-        }
-
-        if (data.type === 'color') {
-          if ('fg' in data) ansiState.fg = data.fg !== null ? ANSI_FG[data.fg] : null;
-          if ('bg' in data) ansiState.bg = data.bg !== null ? ANSI_BG[data.bg] : null;
-        }
-
-        if (data.type === 'clear') {
-          termClear();
-        }
-
-        if (data.type === 'exit') {
-          ansiState = { fg: null, bg: null };
-          readKeyMode = false;
-          setStatus('');
-          setRunning(false);
-          ws = null;
-          if (data.errors && data.errors.length > 0) {
-            showErrors(data.errors);
-          }
-          if (data.code !== 0 && data.errors && data.errors.length === 0) {
-            termAppend('\n[Programma gestopt met exitcode ' + data.code + ']');
-          }
-        }
-      };
-
-      ws.onclose = function () {
-        setStatus('');
+      // Stap 1: Compileer op de server (Roslyn → IL-bytes)
+      let compileResult;
+      try {
+        const resp = await fetch('/api/compile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        });
+        compileResult = await resp.json();
+      } catch (err) {
+        termAppend('[Netwerkfout: ' + err.message + ']');
         setRunning(false);
-        ws = null;
-      };
+        running = false;
+        return;
+      }
 
-      ws.onerror = function () {
-        termAppend('\n[Verbindingsfout]');
-        setStatus('');
+      // Toon compile-fouten
+      if (compileResult.errors && compileResult.errors.length > 0) {
+        showErrors(compileResult.errors);
+      }
+
+      if (!compileResult.dll) {
         setRunning(false);
-        ws = null;
-      };
+        running = false;
+        setStatus('');
+        return;
+      }
+
+      setStatus('');
+
+      // Stap 2: Decodeer base64 DLL
+      const raw    = atob(compileResult.dll);
+      const dll    = new Uint8Array(raw.length);
+      for (let i = 0; i < raw.length; i++) dll[i] = raw.charCodeAt(i);
+
+      // Stap 3: Wacht tot de WASM runtime klaar is
+      if (!wasmReady) {
+        setStatus('WASM laden...');
+        await new Promise((resolve) => {
+          const check = setInterval(() => {
+            if (wasmReady) { clearInterval(check); resolve(); }
+          }, 100);
+          setTimeout(() => { clearInterval(check); resolve(); }, 30000);
+        });
+        setStatus('');
+      }
+
+      if (!wasmExports) {
+        termAppend('[WASM runtime niet beschikbaar.]');
+        setRunning(false);
+        running = false;
+        return;
+      }
+
+      // Stap 4: Voer DLL uit op thread pool thread (Task.Run in C#)
+      wasmExports.WasmExports.RunCode(dll).catch(function (err) {
+        termAppend('\n[Fout: ' + (err?.message ?? err) + ']');
+        setRunning(false);
+        running = false;
+      });
     }
 
     function stopCode() {
-      if (ws) ws.send(JSON.stringify({ type: 'stop' }));
+      if (wasmExports && running) {
+        wasmExports.WasmExports.SetCancelled().catch(function () {});
+      }
     }
 
     // ── Terminal invoer ───────────────────────────────────
     termInput.addEventListener('keydown', function (e) {
       if (readKeyMode && e.key.length === 1) {
-        // Één toets sturen zonder Enter
         e.preventDefault();
         readKeyMode = false;
         const val = e.key;
         termInput.value = '';
         termAppend(val + '\n');
-        if (ws) ws.send(JSON.stringify({ type: 'input', data: val }));
+        wasmExports.WasmExports.ProvideInput(val).catch(function () {});
         scheduleInputEnable();
         return;
       }
@@ -381,7 +438,7 @@ class Program
         const val = termInput.value;
         termInput.value = '';
         termAppend(val + '\n');
-        if (ws) ws.send(JSON.stringify({ type: 'input', data: val }));
+        wasmExports.WasmExports.ProvideInput(val).catch(function () {});
         scheduleInputEnable();
       }
     });
@@ -517,6 +574,8 @@ class Program
       function () { return document.getElementById('errors-panel'); },
       function () { return !workspace.classList.contains('layout-stacked'); }
     );
+
+    // WASM init start al bij het laden van de pagina (hierboven)
 
   });
 

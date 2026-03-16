@@ -24,11 +24,19 @@ while (true)
     try { req = JsonSerializer.Deserialize<RunRequest>(line, jsonOptions); } catch { }
     if (req?.Code == null) { WriteResult(Error("Ongeldige invoer.")); continue; }
 
+    // ── Compile modus (voor WASM) ─────────────────────────────────────────────
+    if (req.Type == "compile")
+    {
+        WriteCompileResult(CompileCode(req.Code));
+        continue;
+    }
+
+    // ── Script modus (voor /api/run) ──────────────────────────────────────────
     var code = PrepareCode(req.Code);
     var outputLines = new List<string>();
     var errors = new List<RunError>();
 
-    var sb = new StringBuilder();
+    var sb     = new StringBuilder();
     var oldOut = Console.Out;
     var oldIn  = Console.In;
 
@@ -60,7 +68,6 @@ while (true)
             if (d.Severity is DiagnosticSeverity.Error or DiagnosticSeverity.Warning)
             {
                 var span = d.Location.GetLineSpan();
-                // Herstel regelnummer: aftrekken van de automatisch toegevoegde aanroep
                 var line1 = span.StartLinePosition.Line + 1;
                 errors.Add(new RunError(line1, span.StartLinePosition.Character + 1,
                     d.Severity == DiagnosticSeverity.Warning ? "warning" : "error",
@@ -87,7 +94,68 @@ while (true)
     WriteResult(new RunResult(outputLines, errors));
 }
 
-// ── Hulpfuncties ──────────────────────────────────────
+// ── Compile-only (voor WASM export) ───────────────────────────────────────────
+
+static CompileResult CompileCode(string code)
+{
+    // Voeg standaard using-statements toe als een aparte syntax tree
+    var globalUsingsTree = CSharpSyntaxTree.ParseText(
+        """
+        global using System;
+        global using System.Collections.Generic;
+        global using System.Linq;
+        global using System.Text;
+        global using System.Text.Json;
+        global using System.IO;
+        global using System.Threading;
+        global using System.Threading.Tasks;
+        """,
+        CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest));
+
+    var userCodeTree = CSharpSyntaxTree.ParseText(
+        code,
+        CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest));
+
+    var refs = AppDomain.CurrentDomain.GetAssemblies()
+        .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
+        .Select(a => (MetadataReference)MetadataReference.CreateFromFile(a.Location))
+        .ToList();
+
+    var compilation = CSharpCompilation.Create(
+        "StudentCode",
+        syntaxTrees: [globalUsingsTree, userCodeTree],
+        references: refs,
+        options: new CSharpCompilationOptions(
+            OutputKind.ConsoleApplication,
+            allowUnsafe: false,
+            optimizationLevel: OptimizationLevel.Release,
+            nullableContextOptions: NullableContextOptions.Enable));
+
+    using var ms = new MemoryStream();
+    var emitResult = compilation.Emit(ms);
+
+    if (emitResult.Success)
+    {
+        return new CompileResult(Convert.ToBase64String(ms.ToArray()), []);
+    }
+
+    var errors = new List<RunError>();
+    foreach (var d in emitResult.Diagnostics)
+    {
+        if (d.Severity is DiagnosticSeverity.Hidden) continue;
+        if (d.Location.SourceTree != userCodeTree) continue; // negeer fouten in de injected usings
+
+        var span = d.Location.GetLineSpan();
+        errors.Add(new RunError(
+            span.StartLinePosition.Line + 1,
+            span.StartLinePosition.Character + 1,
+            d.Severity == DiagnosticSeverity.Warning ? "warning" : "error",
+            d.GetMessage()));
+    }
+    return new CompileResult(null, errors);
+}
+
+// ── Hulpfuncties ──────────────────────────────────────────────────────────────
 
 // Detecteer class+Main stijl en voeg een reflectie-aanroep toe (werkt ook als Main private is)
 static string PrepareCode(string code)
@@ -97,7 +165,6 @@ static string PrepareCode(string code)
     if (hasMain && classMatch.Success)
     {
         var cls = classMatch.Groups[1].Value;
-        // Gebruik reflectie zodat private Main ook werkt
         return code + $@"
 {{
     var __t = System.Reflection.Assembly.GetExecutingAssembly()?.GetTypes()
@@ -131,9 +198,16 @@ void WriteResult(RunResult result)
     Console.Out.Flush();
 }
 
+void WriteCompileResult(CompileResult result)
+{
+    Console.Out.WriteLine(JsonSerializer.Serialize(result, jsonOptions));
+    Console.Out.Flush();
+}
+
 static RunResult Error(string msg) =>
     new RunResult([], [new RunError(0, 0, "error", msg)]);
 
-record RunRequest(string Code, string? Input);
+record RunRequest(string Code, string? Input, string? Type);
 record RunError(int Line, int Col, string Severity, string Message);
 record RunResult(List<string> Output, List<RunError> Errors);
+record CompileResult(string? Dll, List<RunError> Errors);
