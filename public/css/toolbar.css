@@ -1,0 +1,64 @@
+/*
+ * Toolbar styles
+ *
+ * @author Rogier van der Linde <rogier@bitmatters.be>
+ */
+
+/* toolbar */
+
+.toolbar {
+   align-items: center;
+   background: var(--bg-toolbar);
+   border-bottom: 1px solid var(--border);
+   display: flex;
+   flex-shrink: 0;
+   height: var(--toolbar-h);
+   justify-content: space-between;
+   padding: 0 12px;
+   user-select: none;
+}
+
+.toolbar__actions {
+   align-items: center;
+   display: flex;
+   gap: 8px;
+}
+
+.toolbar__brand {
+   align-items: center;
+   display: flex;
+   gap: 8px;
+}
+
+.toolbar__logo {
+   color: var(--accent-cs);
+   height: 22px;
+   width: 22px;
+}
+
+.toolbar__title {
+   color: var(--text-title);
+   font-size: 15px;
+   font-weight: 600;
+   letter-spacing: 0.5px;
+}
+
+/* file upload */
+
+#input-upload {
+   display: none;
+}
+
+/* theme toggle icons */
+
+.icon-moon {
+   display: none;
+}
+
+html.theme-light .icon-moon {
+   display: inline;
+}
+
+html.theme-light .icon-sun {
+   display: none;
+}

@@ -1,0 +1,70 @@
+/*
+ * Theme — CSS custom properties
+ *
+ * @author Rogier van der Linde <rogier@bitmatters.be>
+ */
+
+/* dark theme (default) */
+
+:root {
+   --accent-cs:       #512bd4;
+   --accent-dl:       #2b5797;
+   --accent-dl-h:     #3a6ec0;
+   --accent-run:      #0e7a3d;
+   --accent-run-h:    #11a050;
+   --bg-base:         #1e1e1e;
+   --bg-header:       #2d2d30;
+   --bg-terminal:     #0d0d0d;
+   --bg-toolbar:      #252526;
+   --border:          #3e3e42;
+   --btn-bg:          #3c3c3c;
+   --btn-bg-h:        #4a4a4a;
+   --btn-collapse-h:  #3e3e42;
+   --btn-text:        #ffffff;
+   --error-bg:        #1a0808;
+   --error-border:    #2a1010;
+   --error-color:     #f47067;
+   --input-border:    #1e1e1e;
+   --placeholder:     #444;
+   --resizer-w:       5px;
+   --scrollbar-bg:    #1e1e1e;
+   --scrollbar-h:     #777;
+   --scrollbar-thumb: #555;
+   --text-code:       #cccccc;
+   --text-muted:      #858585;
+   --text-primary:    #cccccc;
+   --text-title:      #d4d4d4;
+   --toolbar-h:       44px;
+   --warn-bg:         #1a1400;
+   --warn-border:     #2a2000;
+   --warn-color:      #e5c07b;
+}
+
+/* light theme */
+
+html.theme-light {
+   --bg-base:         #f3f3f3;
+   --bg-header:       #dddddd;
+   --bg-terminal:     #ffffff;
+   --bg-toolbar:      #e8e8e8;
+   --border:          #c8c8c8;
+   --btn-bg:          #d8d8d8;
+   --btn-bg-h:        #c4c4c4;
+   --btn-collapse-h:  #cccccc;
+   --btn-text:        #1e1e1e;
+   --error-bg:        #fff0f0;
+   --error-border:    #ffc8c8;
+   --error-color:     #c0392b;
+   --input-border:    #d8d8d8;
+   --placeholder:     #aaaaaa;
+   --scrollbar-bg:    #f3f3f3;
+   --scrollbar-h:     #999999;
+   --scrollbar-thumb: #bbbbbb;
+   --text-code:       #1e1e1e;
+   --text-muted:      #777777;
+   --text-primary:    #333333;
+   --text-title:      #333333;
+   --warn-bg:         #fffbec;
+   --warn-border:     #ffe080;
+   --warn-color:      #7a5500;
+}

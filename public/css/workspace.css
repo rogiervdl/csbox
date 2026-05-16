@@ -1,0 +1,360 @@
+/*
+ * Workspace & panel styles
+ *
+ * @author Rogier van der Linde <rogier@bitmatters.be>
+ */
+
+/* workspace */
+
+.workspace {
+   display: flex;
+   flex-direction: row;
+   height: calc(100vh - var(--toolbar-h));
+   overflow: hidden;
+}
+
+.workspace.layout-stacked {
+   flex-direction: column;
+}
+
+.workspace.layout-stacked .editor-panel {
+   border-bottom: 1px solid var(--border);
+   border-right: none;
+   flex: 0 0 50%;
+   min-width: 0;
+   width: 100%;
+}
+
+.workspace.layout-stacked .errors-panel {
+   border-left: 1px solid var(--border);
+   border-top: none;
+   flex: 0 0 280px;
+   min-height: 0;
+}
+
+.workspace.layout-stacked .output-panel {
+   border-right: 1px solid var(--border);
+   flex: 1 1 0;
+   min-height: 0;
+   min-width: 80px;
+}
+
+.workspace.layout-stacked .resizer--main {
+   cursor: row-resize;
+   height: var(--resizer-w);
+   width: auto;
+}
+
+.workspace.layout-stacked .resizer--vertical {
+   cursor: col-resize;
+   height: auto;
+   width: var(--resizer-w);
+}
+
+.workspace.layout-stacked .right-panel {
+   flex-direction: row;
+   min-width: 0;
+   width: 100%;
+}
+
+/* panel headers */
+
+.panel-body {
+   flex: 1;
+   overflow: hidden;
+}
+
+.panel-header {
+   align-items: center;
+   background: var(--bg-header);
+   border-bottom: 1px solid var(--border);
+   display: flex;
+   flex-shrink: 0;
+   gap: 6px;
+   height: 30px;
+   padding: 0 12px;
+}
+
+.panel-label {
+   color: var(--text-muted);
+   flex: 1;
+   font-size: 11px;
+   font-weight: 600;
+   letter-spacing: 1px;
+   text-transform: uppercase;
+}
+
+.panel-label--cs {
+   color: var(--accent-cs);
+}
+
+/* editor panel */
+
+.editor-panel {
+   border-right: 1px solid var(--border);
+   display: flex;
+   flex: 0 0 50%;
+   flex-direction: column;
+   min-width: 200px;
+   overflow: hidden;
+}
+
+/* right panel */
+
+.right-panel {
+   display: flex;
+   flex: 1 1 0;
+   flex-direction: column;
+   min-width: 200px;
+   overflow: hidden;
+}
+
+/* output panel */
+
+.output-body {
+   color: var(--text-code);
+   font-family: 'Consolas', 'Courier New', monospace;
+   font-size: 13px;
+   line-height: 1.6;
+   overflow-y: auto;
+   padding: 8px 12px;
+   white-space: pre-wrap;
+   word-break: break-all;
+}
+
+.output-line {
+   padding: 1px 0;
+}
+
+.output-panel {
+   background: var(--bg-terminal);
+   display: flex;
+   flex: 1 1 0;
+   flex-direction: column;
+   min-height: 80px;
+   overflow: hidden;
+}
+
+/* errors panel */
+
+.error-entry {
+   align-items: baseline;
+   background: var(--error-bg);
+   border-bottom: 1px solid var(--error-border);
+   color: var(--error-color);
+   display: flex;
+   gap: 8px;
+   padding: 2px 12px;
+   white-space: pre-wrap;
+   word-break: break-all;
+}
+
+.error-entry--warning {
+   background: var(--warn-bg);
+   border-bottom-color: var(--warn-border);
+   color: var(--warn-color);
+}
+
+.error-entry__location {
+   color: var(--text-muted);
+   flex-shrink: 0;
+   font-size: 10px;
+   min-width: 60px;
+}
+
+.error-entry__text {
+   flex: 1;
+}
+
+.errors-badge {
+   align-items: center;
+   background: #c0392b;
+   border-radius: 8px;
+   color: #fff;
+   display: none;
+   font-size: 10px;
+   font-weight: 700;
+   height: 16px;
+   justify-content: center;
+   line-height: 1;
+   min-width: 16px;
+   padding: 0 4px;
+}
+
+.errors-badge.visible {
+   display: inline-flex;
+}
+
+.errors-body {
+   flex: 1;
+   font-family: 'Consolas', 'Courier New', monospace;
+   font-size: 12px;
+   line-height: 1.6;
+   overflow-y: auto;
+   padding: 4px 0;
+}
+
+.errors-panel {
+   background: var(--bg-terminal);
+   border-top: 1px solid var(--border);
+   display: flex;
+   flex: 0 0 180px;
+   flex-direction: column;
+   min-height: 30px;
+   overflow: hidden;
+   transition: flex-basis 0.2s;
+}
+
+.errors-panel.is-collapsed {
+   flex: 0 0 30px;
+}
+
+.errors-panel.is-collapsed .btn-collapse svg {
+   transform: rotate(180deg);
+}
+
+.errors-panel.is-collapsed .errors-body {
+   display: none;
+}
+
+/* resizers */
+
+.resizer {
+   background: var(--border);
+   flex-shrink: 0;
+   transition: background 0.15s;
+}
+
+.resizer--main {
+   cursor: col-resize;
+   width: var(--resizer-w);
+}
+
+.resizer--vertical {
+   cursor: row-resize;
+   height: var(--resizer-w);
+}
+
+.resizer.is-dragging,
+.resizer:hover {
+   background: var(--accent-cs);
+}
+
+/* terminal panel */
+
+.terminal-caret {
+   color: var(--accent-cs);
+   flex-shrink: 0;
+   font-family: 'Consolas', 'Courier New', monospace;
+   font-size: 14px;
+   font-weight: bold;
+}
+
+.terminal-input {
+   background: transparent;
+   border: none;
+   caret-color: var(--accent-cs);
+   color: var(--text-code);
+   flex: 1;
+   font-family: 'Consolas', 'Courier New', monospace;
+   font-size: 13px;
+   outline: none;
+}
+
+.terminal-input:disabled {
+   cursor: not-allowed;
+   opacity: 0.3;
+}
+
+.terminal-input::placeholder {
+   color: var(--placeholder);
+}
+
+.terminal-inputline {
+   align-items: center;
+   border-top: 1px solid var(--input-border);
+   display: flex;
+   flex-shrink: 0;
+   gap: 6px;
+   padding: 4px 12px 6px;
+}
+
+.terminal-output {
+   color: var(--text-code);
+   flex: 1;
+   font-family: 'Consolas', 'Courier New', monospace;
+   font-size: 13px;
+   line-height: 1.6;
+   margin: 0;
+   overflow-y: auto;
+   padding: 8px 12px;
+   white-space: pre-wrap;
+   word-break: break-all;
+}
+
+.terminal-panel {
+   background: var(--bg-terminal);
+   display: flex;
+   flex: 1 1 0;
+   flex-direction: column;
+   min-height: 80px;
+   overflow: hidden;
+}
+
+.terminal-status {
+   color: var(--text-muted);
+   flex: 1;
+   font-size: 11px;
+   font-style: italic;
+   padding-left: 4px;
+}
+
+/* input panel */
+
+.input-body {
+   background: var(--bg-terminal);
+   border: none;
+   color: var(--text-code);
+   flex: 1;
+   font-family: 'Consolas', 'Courier New', monospace;
+   font-size: 13px;
+   line-height: 1.6;
+   outline: none;
+   overflow-y: auto;
+   padding: 6px 12px;
+   resize: none;
+}
+
+.input-body::placeholder {
+   color: var(--placeholder);
+}
+
+.input-hint {
+   color: var(--text-muted);
+   font-size: 10px;
+   font-style: italic;
+   margin-right: 6px;
+}
+
+.input-panel {
+   background: var(--bg-terminal);
+   border-top: 1px solid var(--border);
+   display: flex;
+   flex: 0 0 120px;
+   flex-direction: column;
+   min-height: 30px;
+   overflow: hidden;
+   transition: flex-basis 0.2s;
+}
+
+.input-panel.is-collapsed {
+   flex: 0 0 30px;
+}
+
+.input-panel.is-collapsed .btn-collapse svg {
+   transform: rotate(180deg);
+}
+
+.input-panel.is-collapsed .input-body {
+   display: none;
+}

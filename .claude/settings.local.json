@@ -5,7 +5,15 @@
       "Bash(cd C:/Users/rogie/Desktop/csbox && powershell -Command \"Stop-Process -Id \\(Get-NetTCPConnection -LocalPort 3003 -ErrorAction SilentlyContinue\\).OwningProcess -Force -ErrorAction SilentlyContinue\" && node app.js)",
       "Bash(sleep 3 && curl -s http://localhost:3003 -o /dev/null -w \"%{http_code}\")",
       "Bash(cd C:/Users/rogie/Desktop/csbox && node app.js)",
-      "Bash(dotnet publish:*)"
+      "Bash(dotnet publish:*)",
+      "Skill(css-base)",
+      "Skill(css-base:*)",
+      "Skill(html-base)",
+      "Skill(html-base:*)",
+      "Skill(js-base)",
+      "Skill(js-base:*)",
+      "Skill(js-app-esmodules)",
+      "Skill(js-app-esmodules:*)"
     ]
   }
 }
