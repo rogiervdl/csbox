@@ -22,7 +22,8 @@
    white-space: nowrap;
 }
 
-.btn svg {
+.btn svg,
+.btn img {
    flex-shrink: 0;
    height: 14px;
    width: 14px;
@@ -51,7 +52,8 @@
    opacity: 0.7;
 }
 
-.btn--primary.is-running svg {
+.btn--primary.is-running svg,
+.btn--primary.is-running img {
    animation: spin 0.8s linear infinite;
 }
 
@@ -104,7 +106,8 @@
    width: 20px;
 }
 
-.btn-collapse svg {
+.btn-collapse svg,
+.btn-collapse img {
    height: 14px;
    transition: transform 0.2s;
    width: 14px;

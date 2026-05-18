@@ -31,7 +31,6 @@
 }
 
 .toolbar__logo {
-   color: var(--accent-cs);
    height: 22px;
    width: 22px;
 }
@@ -41,6 +40,12 @@
    font-size: 15px;
    font-weight: 600;
    letter-spacing: 0.5px;
+}
+
+/* button labels */
+
+.toolbar .btn span {
+   display: none;
 }
 
 /* file upload */
@@ -61,4 +66,16 @@ html.theme-light .icon-moon {
 
 html.theme-light .icon-sun {
    display: none;
+}
+
+html.theme-light .btn--icon img {
+   filter: brightness(0);
+}
+
+/* media queries */
+
+@media (width >= 1200px) {
+   .toolbar .btn span {
+      display: inline;
+   }
 }
