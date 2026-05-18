@@ -13,12 +13,12 @@ Console.WriteLine("-------------");
 
 List<Workout> workouts = new List<Workout>
 {
-    new Cardio { Naam = "Ochtendrun", Beschrijving = "Rustig tempo door het park", AfstandInKm = 5.2 },
-    new Krachttraining { Naam = "Bench press", Beschrijving = "Borstspieren", Gewicht = 60, Reps = 12 },
-    new Stretching { Naam = "Rugstretching", Beschrijving = "Na het tillen", LichaamsDeel = LichaamsDeel.Rug },
-    new Cardio { Naam = "Fietstocht", Beschrijving = "Intervaltraining", AfstandInKm = 22.0 },
-    new Krachttraining { Naam = "Squat", Beschrijving = "Beenspieren", Gewicht = 80, Reps = 8 },
-    new Stretching { Naam = "Nekrol", Beschrijving = "Ontspanning na beeldschermwerk", LichaamsDeel = LichaamsDeel.Nek },
+   new Cardio { Naam = "Ochtendrun", Beschrijving = "Rustig tempo door het park", AfstandInKm = 5.2 },
+   new Krachttraining { Naam = "Bench press", Beschrijving = "Borstspieren", Gewicht = 60, Reps = 12 },
+   new Stretching { Naam = "Rugstretching", Beschrijving = "Na het tillen", LichaamsDeel = LichaamsDeel.Rug },
+   new Cardio { Naam = "Fietstocht", Beschrijving = "Intervaltraining", AfstandInKm = 22.0 },
+   new Krachttraining { Naam = "Squat", Beschrijving = "Beenspieren", Gewicht = 80, Reps = 8 },
+   new Stretching { Naam = "Nekrol", Beschrijving = "Ontspanning na beeldschermwerk", LichaamsDeel = LichaamsDeel.Nek },
 };
 
 Console.WriteLine("Overzicht workouts:");
@@ -36,42 +36,42 @@ Console.WriteLine("Totale punten per type:");
 
 abstract class Workout
 {
-    public string Naam { get; set; } = string.Empty;
-    public string Beschrijving { get; set; } = string.Empty;
+   public string Naam { get; set; } = string.Empty;
+   public string Beschrijving { get; set; } = string.Empty;
 
-    // 2. Haal dit uit commentaar (nadat je Punten hebt toegevoegd aan de subklassen)
-    //public override string ToString()
-    //{
-    //    return $"{Naam} ({Punten} punten) — {Beschrijving}";
-    //}
+   // 2. Haal dit uit commentaar (nadat je Punten hebt toegevoegd aan de subklassen)
+   //public override string ToString()
+   //{
+   //    return $"{Naam} ({Punten} punten) — {Beschrijving}";
+   //}
 }
 
 class Cardio : Workout
 {
-    public double AfstandInKm { get; set; }
-    // 1. Voeg Punten toe: AfstandInKm * 6 (afronden naar int)
+   public double AfstandInKm { get; set; }
+   // 1. Voeg Punten toe: AfstandInKm * 6 (afronden naar int)
 }
 
 class Krachttraining : Workout
 {
-    public double Gewicht { get; set; }
-    public int Reps { get; set; }
-    // 1. Voeg Punten toe: (Gewicht * Reps) / 5 (afronden naar int)
+   public double Gewicht { get; set; }
+   public int Reps { get; set; }
+   // 1. Voeg Punten toe: (Gewicht * Reps) / 5 (afronden naar int)
 }
 
 class Stretching : Workout
 {
-    public LichaamsDeel LichaamsDeel { get; set; }
-    // 1. Voeg Punten toe: altijd 10
+   public LichaamsDeel LichaamsDeel { get; set; }
+   // 1. Voeg Punten toe: altijd 10
 }
 
 enum LichaamsDeel
 {
-    Rug,
-    Schouders,
-    Borst,
-    Benen,
-    Heupen,
-    Nek,
-    Armen,
+   Rug,
+   Schouders,
+   Borst,
+   Benen,
+   Heupen,
+   Nek,
+   Armen,
 }

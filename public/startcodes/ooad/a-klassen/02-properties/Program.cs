@@ -33,5 +33,5 @@ Console.WriteLine("-------------");
 
 class Recept
 {
-    // Voeg hier de properties toe
+   // Voeg hier de properties toe
 }

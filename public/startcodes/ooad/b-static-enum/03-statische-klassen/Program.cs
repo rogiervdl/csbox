@@ -31,5 +31,5 @@ Console.WriteLine("-------------");
 
 static class TekstAnalyse
 {
-    // Voeg hier de implementatie toe
+   // Voeg hier de implementatie toe
 }

@@ -30,5 +30,5 @@ Console.WriteLine("-------------");
 
 class CouponCode
 {
-    // Voeg hier de implementatie toe
+   // Voeg hier de implementatie toe
 }

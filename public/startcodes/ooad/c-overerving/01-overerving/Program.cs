@@ -21,7 +21,7 @@ klanten.Add(new Klant { Naam = "Milan De Vos", Email = "milan.devos@yahoo.com" }
 Console.WriteLine("Overzicht klanten:");
 foreach (Klant klant in klanten)
 {
-    Console.WriteLine($"- {klant}");
+   Console.WriteLine($"- {klant}");
 }
 
 // ============================================================
@@ -30,18 +30,18 @@ foreach (Klant klant in klanten)
 
 class Klant
 {
-    public string Naam { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
+   public string Naam { get; set; } = string.Empty;
+   public string Email { get; set; } = string.Empty;
 
-    public override string ToString()
-    {
-        return $"{Naam} ({Email})";
-    }
+   public override string ToString()
+   {
+      return $"{Naam} ({Email})";
+   }
 }
 
 // 2. Maak hier de klasse ProfessioneleKlant
 class ProfessioneleKlant : Klant
 {
-    // Voeg properties BedrijfsNaam en BtwNummer toe
-    // Voeg een override ToString() toe
+   // Voeg properties BedrijfsNaam en BtwNummer toe
+   // Voeg een override ToString() toe
 }

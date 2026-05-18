@@ -23,5 +23,5 @@ Console.WriteLine("-------------");
 
 enum Prioriteit
 {
-    // Voeg hier de waarden toe
+   // Voeg hier de waarden toe
 }

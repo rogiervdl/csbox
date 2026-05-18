@@ -133,6 +133,14 @@ app.use((req, res, next) => {
   next();
 });
 
+// blokkeer directe toegang tot oplossingsbestanden
+app.use((req, res, next) => {
+  if (/\/Oplossing\.cs$/i.test(req.path)) {
+    return res.status(403).end();
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '1mb' }));
 

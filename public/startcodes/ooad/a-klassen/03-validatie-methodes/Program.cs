@@ -17,32 +17,32 @@ List<Werknemer> werknemers = new List<Werknemer> { w1, w2, w3 };
 /*
 Werknemer LeesNieuweWerknemer(int id)
 {
-    Console.Write("Naam nieuwe werknemer: ");
-    string naam = Console.ReadLine();
-    Console.Write("Salaris: ");
-    decimal salaris = decimal.Parse(Console.ReadLine());
-    Console.Write("In dienst sinds (yyyy-MM-dd): ");
-    DateOnly inDienstSinds = DateOnly.Parse(Console.ReadLine()!);
-    return new Werknemer { Id = id, Naam = naam, Salaris = salaris, InDienstSinds = inDienstSinds };
+   Console.Write("Naam nieuwe werknemer: ");
+   string naam = Console.ReadLine();
+   Console.Write("Salaris: ");
+   decimal salaris = decimal.Parse(Console.ReadLine());
+   Console.Write("In dienst sinds (yyyy-MM-dd): ");
+   DateOnly inDienstSinds = DateOnly.Parse(Console.ReadLine()!);
+   return new Werknemer { Id = id, Naam = naam, Salaris = salaris, InDienstSinds = inDienstSinds };
 }
 try
 {
-    int maxId = werknemers.Max(w => w.Id);
-    werknemers.Add(LeesNieuweWerknemer(maxId + 1));
-    Console.WriteLine();
-    werknemers.Add(LeesNieuweWerknemer(maxId + 2));
+   int maxId = werknemers.Max(w => w.Id);
+   werknemers.Add(LeesNieuweWerknemer(maxId + 1));
+   Console.WriteLine();
+   werknemers.Add(LeesNieuweWerknemer(maxId + 2));
 }
 catch (ArgumentException ex)
 {
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine($"Fout: {ex.Message}");
-    Console.ForegroundColor = ConsoleColor.White;
+   Console.ForegroundColor = ConsoleColor.Red;
+   Console.WriteLine($"Fout: {ex.Message}");
+   Console.ForegroundColor = ConsoleColor.White;
 }
 catch (FormatException ex)
 {
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine($"Fout: {ex.Message}");
-    Console.ForegroundColor = ConsoleColor.White;
+   Console.ForegroundColor = ConsoleColor.Red;
+   Console.WriteLine($"Fout: {ex.Message}");
+   Console.ForegroundColor = ConsoleColor.White;
 }
 */
 
@@ -54,7 +54,7 @@ catch (FormatException ex)
 Console.WriteLine();
 foreach (Werknemer w in werknemers)
 {
-    Console.WriteLine($"{w.Naam,-20} | {w.Seniority,-6} | {w.Ancienniteit} jaar | €{w.Salaris:F2}");
+   Console.WriteLine($"{w.Naam,-20} | {w.Seniority,-6} | {w.Ancienniteit} jaar | €{w.Salaris:F2}");
 }
 */
 
@@ -71,15 +71,15 @@ Console.WriteLine($"Na opslag verdient {w3.Naam} nu €{w3.Salaris:F2}");
 
 class Werknemer
 {
-    // 1. Voeg properties toe: Id, Naam, Salaris, InDienstSinds
+   // 1. Voeg properties toe: Id, Naam, Salaris, InDienstSinds
 
-    // 2a. Voeg validatie toe aan Salaris: gooi ArgumentException("Salaris kan niet negatief zijn.") als het salaris negatief is
+   // 2a. Voeg validatie toe aan Salaris: gooi ArgumentException("Salaris kan niet negatief zijn.") als het salaris negatief is
 
-    // 2b. Voeg validatie toe aan InDienstSinds: gooi ArgumentException("Datum indiensttreding kan niet in de toekomst liggen.") als de datum in de toekomst ligt
+   // 2b. Voeg validatie toe aan InDienstSinds: gooi ArgumentException("Datum indiensttreding kan niet in de toekomst liggen.") als de datum in de toekomst ligt
 
-    // 3a. Berekende property Ancienniteit (int): aantal jaar in dienst
+   // 3a. Berekende property Ancienniteit (int): aantal jaar in dienst
 
-    // 3b. Berekende property Seniority (string): "Junior" (< 2 jaar), "Medior" (< 5 jaar), "Senior"
+   // 3b. Berekende property Seniority (string): "Junior" (< 2 jaar), "Medior" (< 5 jaar), "Senior"
 
-    // 4. Methode GeefOpslag(decimal percentage): verhoog Salaris met het opgegeven percentage
+   // 4. Methode GeefOpslag(decimal percentage): verhoog Salaris met het opgegeven percentage
 }

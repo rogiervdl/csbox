@@ -24,10 +24,10 @@ Console.WriteLine("-------------");
 
 enum BestelStatus
 {
-    // Voeg hier de waarden toe
+   // Voeg hier de waarden toe
 }
 
 class Bestelling
 {
-    // Voeg hier de implementatie toe
+   // Voeg hier de implementatie toe
 }
