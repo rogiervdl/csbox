@@ -43,19 +43,15 @@ const divModalConfirmBackdrop = document.querySelector('#modal-confirm .modal__b
 // FUNCTIES
 // ========
 
-/**
- * Laadt en parseert startcodes/index.json5.
- */
 async function loadIndex() {
    try {
-      const response = await fetch('startcodes/index.json5');
+      const response = await fetch('startcodes/index.json');
       if (!response.ok) return;
-      const text = await response.text();
-      subjectsData = JSON5.parse(text).subjects;
+      subjectsData = (await response.json()).subjects;
       populateSubjects();
       restoreSelection();
    } catch (e) {
-      console.warn('Exercises: kon index.json5 niet laden', e);
+      console.warn('Exercises: kon index.json niet laden', e);
    }
 }
 

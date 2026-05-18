@@ -31,12 +31,6 @@ console.log('Kopieer JSZip...');
 fs.mkdirSync(vendorDir, { recursive: true });
 fs.copyFileSync(jszipSrc, jszipDest);
 
-// Copy JSON5
-const json5Src = path.join(root, 'node_modules', 'json5', 'dist', 'index.min.js');
-const json5Dest = path.join(vendorDir, 'json5.min.js');
-console.log('Kopieer JSON5...');
-fs.copyFileSync(json5Src, json5Dest);
-
 // Copy marked
 const markedSrc = path.join(root, 'node_modules', 'marked', 'lib', 'marked.umd.js');
 const markedDest = path.join(vendorDir, 'marked.min.js');
