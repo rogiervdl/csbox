@@ -5,7 +5,6 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "postinstall": "node scripts/copy-vendor.js",
     "setup": "node scripts/copy-vendor.js",
     "build:wasm": "dotnet publish wasm-host/ -c Release"
   },
