@@ -11,6 +11,7 @@ import { Errors }    from './modules/errors.js';
 import { Wasm }      from './modules/wasm.js';
 import { Toolbar }   from './modules/toolbar.js';
 import { Resizer }   from './modules/resizer.js';
+import { Exercises } from './modules/exercises.js';
 
 require(['vs/editor/editor.main'], initApp);
 
@@ -36,6 +37,7 @@ function initApp() {
    Wasm.init(Terminal, Errors);
    Toolbar.init(editor, Wasm);
    Resizer.init(editor);
+   Exercises.init(editor);
 
    const handleEditorRunShortcut = () => Wasm.run(editor.getValue());
    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, handleEditorRunShortcut);

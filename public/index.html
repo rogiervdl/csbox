@@ -20,6 +20,25 @@
          </svg>
          <span class="toolbar__title">CSBox</span>
       </div>
+      <!-- oefeningen -->
+      <div class="toolbar__exercises">
+         <select id="select-subject" class="select">
+            <option value="">Vak...</option>
+         </select>
+         <select id="select-module" class="select" disabled>
+            <option value="">Module...</option>
+         </select>
+         <select id="select-exercise" class="select" disabled>
+            <option value="">Oefening...</option>
+         </select>
+         <button id="btn-opgave" class="btn btn--icon" type="button" title="geen opgave gegeven" disabled>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Opgave</span>
+         </button>
+      </div>
+
       <div class="toolbar__actions">
          <button id="btn-theme" class="btn btn--icon" title="Wissel thema" aria-label="Wissel thema">
             <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -123,7 +142,42 @@
 
    </main>
 
+   <!-- bevestigingsdialoog bewaarde versie -->
+   <div id="modal-confirm" class="modal" aria-hidden="true">
+      <div class="modal__backdrop"></div>
+      <div class="modal__dialog modal__dialog--sm">
+         <div class="modal__body">
+            <p>Er is een bewaarde versie gevonden. Wil je deze laden of herbeginnen vanaf de startcode?</p>
+            <div class="modal__actions">
+               <button id="btn-confirm-bewaarde" class="btn btn--primary" type="button">Bewaarde versie</button>
+               <button id="btn-confirm-startcode" class="btn" type="button">Startcode</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- opgave modal -->
+   <div id="modal-opgave" class="modal" aria-hidden="true">
+      <div class="modal__backdrop"></div>
+      <div class="modal__dialog">
+         <div class="modal__header">
+            <span class="modal__title">Opgave</span>
+            <div class="modal__header-actions">
+               <button id="btn-opgave-newtab" class="btn btn--xs btn--icon" type="button" title="Openen in nieuw tabblad" disabled>
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+               </button>
+               <button id="btn-modal-close" class="btn-close" type="button" title="Sluiten">&times;</button>
+            </div>
+         </div>
+         <div id="modal-opgave-body" class="modal__body"></div>
+      </div>
+   </div>
+
    <script src="vendor/jszip.min.js"></script>
+   <script src="vendor/json5.min.js"></script>
+   <script src="vendor/marked.min.js"></script>
    <script src="vendor/monaco-editor/min/vs/loader.js"></script>
    <script type="module" src="js/main.js"></script>
 

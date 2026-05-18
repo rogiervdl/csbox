@@ -48,7 +48,7 @@ while (true)
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var opts = ScriptOptions.Default
-            .WithLanguageVersion(LanguageVersion.Latest)
+            .WithLanguageVersion(LanguageVersion.Preview)
             .WithReferences(AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location)))
             .WithImports(
@@ -110,11 +110,11 @@ static CompileResult CompileCode(string code)
         global using System.Threading;
         global using System.Threading.Tasks;
         """,
-        CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest));
+        CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview));
 
     var userCodeTree = CSharpSyntaxTree.ParseText(
         code,
-        CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest));
+        CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview));
 
     var refs = AppDomain.CurrentDomain.GetAssemblies()
         .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
