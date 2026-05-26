@@ -39,6 +39,9 @@ function initApp() {
    Resizer.init(editor);
    Exercises.init(editor);
 
-   const handleEditorRunShortcut = () => Wasm.run(editor.getValue());
+   function handleEditorRunShortcut() {
+      Wasm.run(editor.getValue());
+   }
    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, handleEditorRunShortcut);
+   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, Toolbar.handleBtnRunFromShortcut);
 }

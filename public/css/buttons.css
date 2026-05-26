@@ -29,7 +29,8 @@
    width: 14px;
 }
 
-.btn:active {
+.btn:active,
+.btn.is-pressed {
    opacity: 0.8;
 }
 

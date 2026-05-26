@@ -37,6 +37,30 @@ function handleBtnRunClick() {
    wasm.run(editor.getValue());
 }
 
+function removeButtonPress() {
+   btnRun.classList.remove('is-pressed');
+}
+
+function handleBtnRunFromShortcut() {
+   btnRun.classList.add('is-pressed');
+   wasm.run(editor.getValue());
+   setTimeout(removeButtonPress, 150);
+}
+
+function handleDocumentKeydown(e) {
+   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      btnRun.classList.add('is-pressed');
+   }
+}
+
+function handleDocumentKeyup(e) {
+   if (!btnRun.classList.contains('is-pressed')) return;
+   if (e.key !== 's' && e.key !== 'Control' && e.key !== 'Meta') return;
+   btnRun.classList.remove('is-pressed');
+   wasm.run(editor.getValue());
+}
+
 function handleBtnStopClick() {
    wasm.stop();
 }
@@ -104,6 +128,8 @@ function init(editorInstance, wasmModule) {
    wasm = wasmModule;
 
    btnRun.addEventListener('click', handleBtnRunClick);
+   document.addEventListener('keydown', handleDocumentKeydown);
+   document.addEventListener('keyup', handleDocumentKeyup);
    btnStop.addEventListener('click', handleBtnStopClick);
    btnFormat.addEventListener('click', handleBtnFormatClick);
    btnDownload.addEventListener('click', handleBtnDownloadClick);
@@ -112,4 +138,4 @@ function init(editorInstance, wasmModule) {
    btnLayout.addEventListener('click', handleBtnLayoutClick);
 }
 
-export const Toolbar = { init };
+export const Toolbar = { init, handleBtnRunFromShortcut };
