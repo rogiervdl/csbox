@@ -1,6 +1,8 @@
 Console.WriteLine("Oefening 2: couponcodes controleren");
 Console.WriteLine("-------------");
 
+using System.Text.RegularExpressions;
+
 // Maak onderaan een klasse CouponCode:
 //   - private static string _couponRegex = @"^[A-Z]{3}\d{2}-[A-Z]{2}$"
 //   - property Code (string)
