@@ -43,26 +43,18 @@ Haal de testcode uit commentaar en controleer of het overeenkomt met het verwach
 Herhalingsoefening 3: voertuigverhuur
 ---------------------------------------
 Volledig aanbod:
-  Toyota Yaris (max. 5 passagier(s)) — €45,00/dag — 5 deuren
-  BMW X5 (max. 5 passagier(s)) — €90,00/dag — 5 deuren
-  Ford Transit (max. 2 passagier(s)) — €75,00/dag — 8,5 m³ laadruimte
-  Mercedes Sprinter (max. 2 passagier(s)) — €85,00/dag — 12,0 m³ laadruimte
-  Trek (max. 1 passagier(s)) — €15,00/dag — klassiek
-  Gazelle (max. 1 passagier(s)) — €20,00/dag — elektrisch
+  Toyota Yaris (max. 5 passagier(s)) — €45.00/dag — 5 deuren
+  BMW X5 (max. 5 passagier(s)) — €90.00/dag — 5 deuren
+  Ford Transit (max. 2 passagier(s)) — €75.00/dag — 8.5 m³ laadruimte
+  Mercedes Sprinter (max. 2 passagier(s)) — €85.00/dag — 12.0 m³ laadruimte
+  Trek (max. 1 passagier(s)) — €15.00/dag — klassiek
+  Gazelle (max. 1 passagier(s)) — €20.00/dag — elektrisch
 
 Huurprijs voor 3 dagen:
-  Toyota Yaris: €135,00
-  BMW X5: €270,00
-  Ford Transit: €225,00
-  Mercedes Sprinter: €255,00
-  Trek: €45,00
-  Gazelle: €60,00
-
-Details per voertuig:
-  Auto: Toyota Yaris (max. 5 passagier(s)) — €45,00/dag — 5 deuren
-  Auto: BMW X5 (max. 5 passagier(s)) — €90,00/dag — 5 deuren
-  Bestelwagen: Ford Transit (max. 2 passagier(s)) — €75,00/dag — 8,5 m³ laadruimte
-  Bestelwagen: Mercedes Sprinter (max. 2 passagier(s)) — €85,00/dag — 12,0 m³ laadruimte
-  Fiets: Trek — klassiek
-  Fiets: Gazelle — elektrisch
+  Toyota Yaris: €135.00
+  BMW X5: €270.00
+  Ford Transit: €225.00
+  Mercedes Sprinter: €255.00
+  Trek: €45.00
+  Gazelle: €60.00
 ```
