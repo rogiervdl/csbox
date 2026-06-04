@@ -51,7 +51,7 @@ function transformCode(code) {
 }
 
 // ── Persistente Roslyn runner pool ────────────────────────────────────────────
-const RUNNER_COUNT = parseInt(process.env.RUNNER_COUNT || '4', 10);
+const RUNNER_COUNT = parseInt(process.env.RUNNER_COUNT || '10', 10);
 const MAX_QUEUE    = 10;
 
 const queue   = [];
