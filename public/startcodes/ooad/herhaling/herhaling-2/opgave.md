@@ -26,8 +26,6 @@ Maak een klasse `Lid` met de volgende members. Beslis voor elke member zelf of d
 Haal de testcode uit commentaar en controleer of het overeenkomt met het verwachte resultaat:
 
 ```
-Herhalingsoefening 2: sportclubleden
--------------------------------------
 Totaal aangemaakt: 5
 Actief: 5
 Actief na wijzigingen: 3

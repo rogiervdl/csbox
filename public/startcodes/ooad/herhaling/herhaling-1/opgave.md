@@ -32,8 +32,6 @@ Maak een klasse `Album` met volgende members:
 Haal de testcode uit commentaar en controleer of het overeenkomt met het verwachte resultaat:
 
 ```
-Herhalingsoefening 1: muziekalbum
-----------------------------------
 After Hours — The Weeknd (2020) | 5 nummer(s) | 20:31 | LP
   1. Alone Again (4:02)
   2. Too Late (3:59)
