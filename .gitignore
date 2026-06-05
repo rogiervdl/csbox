@@ -4,3 +4,4 @@ runner/bin/
 runner/obj/
 wasm-host/obj/
 public/wasm-dist/
+public/startcodes/**/examen*/
