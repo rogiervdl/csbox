@@ -37,15 +37,6 @@
                   { "id": "04-is-as", "label": "04. is en as" },
                   { "id": "05-base", "label": "05. base" }
                ]
-            },
-            {
-               "id": "herhaling",
-               "label": "Herhaling",
-               "exercises": [
-                  { "id": "herhaling-1", "label": "Herhaling 1: klassen" },
-                  { "id": "herhaling-2", "label": "Herhaling 2: static en enum" },
-                  { "id": "herhaling-3", "label": "Herhaling 3: overerving" }
-               ]
             }
          ]
       }
