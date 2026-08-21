@@ -4,49 +4,6 @@
          "id": "ooad",
          "label": "OOAD",
          "modules": [
-            {
-               "id": "a-klassen",
-               "label": "A.Klassen",
-               "exercises": [
-                  { "id": "01-lege-klasse", "label": "01. Lege klasse" },
-                  { "id": "02-properties", "label": "02. Properties" },
-                  { "id": "03-validatie-methodes", "label": "03. Validatie & methodes" },
-                  { "id": "04-tostring", "label": "04. ToString()" },
-                  { "id": "05-compositie", "label": "05. Compositie" },
-                  { "id": "06-constructors", "label": "06. Constructors" }
-               ]
-            },
-            {
-               "id": "b-static-enum",
-               "label": "B.Static en enum",
-               "exercises": [
-                  { "id": "01-statische-properties", "label": "01. Statische properties" },
-                  { "id": "02-statische-methodes", "label": "02. Statische methodes" },
-                  { "id": "03-statische-klassen", "label": "03. Statische klassen" },
-                  { "id": "04-enums", "label": "04. Enums" },
-                  { "id": "05-enum-conversies", "label": "05. Enum conversies" }
-               ]
-            },
-            {
-               "id": "c-overerving",
-               "label": "C.Overerving",
-               "exercises": [
-                  { "id": "01-overerving", "label": "01. Eenvoudige overerving" },
-                  { "id": "02-abstracte-klasse", "label": "02. Abstracte klasse" },
-                  { "id": "03-abstracte-members", "label": "03. Abstracte members" },
-                  { "id": "04-is-as", "label": "04. is en as" },
-                  { "id": "05-base", "label": "05. base" }
-               ]
-            },
-            {
-               "id": "herhaling",
-               "label": "Herhaling",
-               "exercises": [
-                  { "id": "herhaling-1", "label": "Herhaling 1: klassen" },
-                  { "id": "herhaling-2", "label": "Herhaling 2: static en enum" },
-                  { "id": "herhaling-3", "label": "Herhaling 3: overerving" }
-               ]
-            }
          ]
       }
    ]
