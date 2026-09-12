@@ -50,14 +50,28 @@ function transformCode(code) {
     .replace(/Console\.ReadKey\s*\(\s*(?:true|false)?\s*\)/g, 'CsBoxHelper.ReadKey()');
 }
 
-// ── Persistente Roslyn runner pool ────────────────────────────────────────────
-const RUNNER_COUNT = parseInt(process.env.RUNNER_COUNT || '10', 10);
-const MAX_QUEUE    = 10;
+// ── Elastische Roslyn runner-pool ─────────────────────────────────────────────
 
-const queue   = [];
-const workers = Array.from({ length: RUNNER_COUNT }, () => ({ proc: null, ready: false, current: null }));
+// ondergrens (altijd warm, voor snelle eerste respons) en bovengrens (bv. tijdens examens) van de pool
+const MIN_RUNNERS = parseInt(process.env.MIN_RUNNERS || '1', 10);
+const MAX_RUNNERS = parseInt(process.env.MAX_RUNNERS || process.env.RUNNER_COUNT || '10', 10);
+// hoelang een runner ongebruikt mag blijven vooraleer hij wordt afgebouwd
+const RUNNER_IDLE_MS = parseInt(process.env.RUNNER_IDLE_TIMEOUT_MS || '300000', 10);
+const MAX_QUEUE = 10;
 
-function spawnRunner(worker) {
+const queue = [];
+let workers = [];
+
+// start een nieuw runnerproces en voeg het toe aan de pool
+function spawnRunner() {
+  const worker = { proc: null, ready: false, current: null, idleTimer: null, stopping: false };
+  workers.push(worker);
+  startProcess(worker);
+  return worker;
+}
+
+// (her)start het onderliggende dotnet-proces voor een worker
+function startProcess(worker) {
   const runnerBin = path.join(__dirname, 'runner-bin', 'runner.dll');
   const proc = fs.existsSync(runnerBin)
     ? spawn('dotnet', [runnerBin], { stdio: ['pipe', 'pipe', 'pipe'] })
@@ -65,6 +79,8 @@ function spawnRunner(worker) {
         { stdio: ['pipe', 'pipe', 'pipe'] });
 
   worker.proc = proc;
+  worker.ready = false;
+  worker.stopping = false;
 
   const rlOut = readline.createInterface({ input: proc.stdout });
   rlOut.on('line', (line) => {
@@ -75,20 +91,52 @@ function spawnRunner(worker) {
     try { resolve(JSON.parse(line)); }
     catch (e) { resolve({ output: [], errors: [{ line: 0, col: 0, severity: 'error', message: 'Parse fout: ' + e.message }] }); }
     processQueue();
+    scheduleIdleShutdown(worker);
   });
 
   const rlErr = readline.createInterface({ input: proc.stderr });
   rlErr.on('line', (line) => {
-    if (line.trim() === 'READY') { worker.ready = true; console.log('C# runner klaar.'); processQueue(); }
+    if (line.trim() === 'READY') {
+      worker.ready = true;
+      console.log(`C# runner klaar (${workers.length} actief).`);
+      processQueue();
+      scheduleIdleShutdown(worker);
+    }
   });
 
   proc.on('exit', (code) => {
+    // bewust afgebouwde (idle) runner: niet herstarten
+    if (worker.stopping) return;
+
     console.warn(`Runner gestopt (exit ${code}), herstart over 2s...`);
     worker.ready = false;
-    worker.proc  = null;
+    worker.proc = null;
     if (worker.current) { worker.current.resolve({ output: [], errors: [] }); clearTimeout(worker.current.timer); worker.current = null; }
-    setTimeout(() => spawnRunner(worker), 2000);
+    setTimeout(() => startProcess(worker), 2000);
   });
+}
+
+// bouw een idle runner af boven de ondergrens MIN_RUNNERS, om geheugen te besparen tussen pieken door
+function scheduleIdleShutdown(worker) {
+  clearTimeout(worker.idleTimer);
+  worker.idleTimer = null;
+  if (worker.current || workers.length <= MIN_RUNNERS) return;
+
+  worker.idleTimer = setTimeout(() => {
+    if (worker.current || !worker.ready || workers.length <= MIN_RUNNERS) return;
+    worker.stopping = true;
+    const idx = workers.indexOf(worker);
+    if (idx >= 0) workers.splice(idx, 1);
+    console.log(`Idle runner afgebouwd (${workers.length} actief).`);
+    try { worker.proc.kill(); } catch {}
+  }, RUNNER_IDLE_MS);
+}
+
+// spawn indien nodig een extra runner zodat de pool kan meegroeien met de wachtrij, tot aan MAX_RUNNERS
+function ensureCapacity() {
+  if (workers.length >= MAX_RUNNERS) return;
+  const idle = workers.filter(w => !w.current).length;
+  if (queue.length > idle) spawnRunner();
 }
 
 function processQueue() {
@@ -96,6 +144,8 @@ function processQueue() {
   for (const worker of workers) {
     if (queue.length === 0) break;
     if (!worker.ready || worker.current) continue;
+    clearTimeout(worker.idleTimer);
+    worker.idleTimer = null;
     worker.current = queue.shift();
     worker.proc.stdin.write(JSON.stringify({
       type:  worker.current.type  || 'run',
@@ -118,6 +168,7 @@ function runBatch(code, input) {
       resolve({ output: [], errors: [{ line: 0, col: 0, severity: 'error', message: 'Timeout.' }] });
     }, 30_000);
     queue.push({ type: 'run', code, input: input || '', resolve, timer });
+    ensureCapacity();
     processQueue();
   });
 }
@@ -135,11 +186,13 @@ function compileBatch(code) {
       resolve({ dll: null, errors: [{ line: 0, col: 0, severity: 'error', message: 'Compile timeout.' }] });
     }, 30_000);
     queue.push({ type: 'compile', code, input: '', resolve, timer });
+    ensureCapacity();
     processQueue();
   });
 }
 
-workers.forEach(spawnRunner);
+// start de ondergrens van de pool alvast op (warme workers voor directe respons)
+for (let i = 0; i < MIN_RUNNERS; i++) spawnRunner();
 
 // ── Express ────────────────────────────────────────────────────────────────────
 
