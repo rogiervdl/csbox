@@ -1,0 +1,13 @@
+{
+   "label": "03. Validatie & methodes",
+   "tests": [
+      { "assert": "csClassExists", "name": "Werknemer", "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Werknemer", "name": "Id", "types": ["int"], "isAuto": true, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Werknemer", "name": "Naam", "types": ["string"], "isAuto": true, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Werknemer", "name": "Salaris", "types": ["decimal"], "isAuto": false, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Werknemer", "name": "InDienstSinds", "types": ["DateOnly"], "isAuto": false, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Werknemer", "name": "Ancienniteit", "types": ["int"], "isAuto": false, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Werknemer", "name": "Seniority", "types": ["string"], "isAuto": false, "caption": "Code" },
+      { "assert": "csMethodExists", "class": "Werknemer", "name": "GeefOpslag", "modifiers": ["public"], "caption": "Code" }
+   ]
+}

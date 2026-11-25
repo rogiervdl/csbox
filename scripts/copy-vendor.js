@@ -16,7 +16,7 @@ function copyDir(src, dest) {
 }
 
 const root = path.join(__dirname, '..');
-const vendorDir = path.join(root, 'public', 'vendor');
+const vendorDir = path.join(root, 'client', 'vendor');
 
 // Copy Monaco Editor
 const monacoSrc = path.join(root, 'node_modules', 'monaco-editor', 'min');
@@ -24,17 +24,19 @@ const monacoDest = path.join(vendorDir, 'monaco-editor', 'min');
 console.log('Kopieer Monaco Editor...');
 copyDir(monacoSrc, monacoDest);
 
-// Copy JSZip
-const jszipSrc = path.join(root, 'node_modules', 'jszip', 'dist', 'jszip.min.js');
-const jszipDest = path.join(vendorDir, 'jszip.min.js');
-console.log('Kopieer JSZip...');
-fs.mkdirSync(vendorDir, { recursive: true });
-fs.copyFileSync(jszipSrc, jszipDest);
-
 // Copy marked
 const markedSrc = path.join(root, 'node_modules', 'marked', 'lib', 'marked.umd.js');
 const markedDest = path.join(vendorDir, 'marked.min.js');
 console.log('Kopieer marked...');
 fs.copyFileSync(markedSrc, markedDest);
 
-console.log('Klaar! Vendor bestanden gekopieerd naar public/vendor/');
+// Copy Prism: de kern (met clike) en de C#-grammatica in één bestand
+const prismDir = path.join(root, 'node_modules', 'prismjs');
+const prismCode = [
+  fs.readFileSync(path.join(prismDir, 'prism.js'), 'utf8'),
+  fs.readFileSync(path.join(prismDir, 'components', 'prism-csharp.js'), 'utf8'),
+].join('\n');
+console.log('Kopieer Prism...');
+fs.writeFileSync(path.join(vendorDir, 'prism.js'), prismCode);
+
+console.log('Klaar! Vendor bestanden gekopieerd naar client/vendor/');

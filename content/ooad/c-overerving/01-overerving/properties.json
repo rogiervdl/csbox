@@ -1,0 +1,10 @@
+{
+   "label": "01. Eenvoudige overerving",
+   "tests": [
+      { "assert": "csClassExists", "name": "ProfessioneleKlant", "base": "Klant", "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "ProfessioneleKlant", "name": "BedrijfsNaam", "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "ProfessioneleKlant", "name": "BtwNummer", "caption": "Code" },
+      { "assert": "csMethodExists", "class": "ProfessioneleKlant", "name": "ToString", "modifiers": ["public", "override"], "caption": "Code" },
+      { "assert": "consoleContains", "contains": "Niels Verhoeven (niels@studio42.be) - Studio 42 BV (BTW: BE0123.456.789)", "caption": "Uitvoer" }
+   ]
+}

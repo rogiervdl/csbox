@@ -1,0 +1,10 @@
+{
+   "label": "01. Statische properties",
+   "tests": [
+      { "assert": "csPropertyExists", "class": "WorkshopDeelnemer", "name": "AantalAangemaakt", "modifiers": ["static"], "accessors": ["get", "private set"], "isAuto": true, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "WorkshopDeelnemer", "name": "AantalAanwezig", "modifiers": ["static"], "accessors": ["get", "private set"], "isAuto": true, "caption": "Code" },
+      { "assert": "csMethodExists", "class": "WorkshopDeelnemer", "name": "ZetAfwezig", "modifiers": ["public"], "caption": "Code" },
+      { "assert": "consoleContains", "contains": "aanwezig: 2", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "wijziging: 1", "caption": "Uitvoer" }
+   ]
+}

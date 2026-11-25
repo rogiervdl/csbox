@@ -1,7 +1,8 @@
 node_modules/
-public/vendor/
+client/vendor/
 runner/bin/
 runner/obj/
+runner-bin/
 wasm-host/obj/
-public/wasm-dist/
-public/startcodes/**/examen*/
+client/wasm-dist/
+content/**/examen*/

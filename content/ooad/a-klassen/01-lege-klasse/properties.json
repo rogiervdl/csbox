@@ -1,0 +1,8 @@
+{
+   "label": "01. Lege klasse",
+   "tests": [
+      { "assert": "csClassExists", "name": "Knikker", "caption": "Code" },
+      { "assert": "csVariableExists", "class": "Program", "name": "potje", "types": ["List<Knikker>"], "caption": "Code" },
+      { "assert": "consoleContains", "contains": "zitten 10 knikkers", "caption": "Uitvoer" }
+   ]
+}

@@ -1,0 +1,11 @@
+{
+   "label": "04. Enums",
+   "tests": [
+      { "assert": "csEnumExists", "name": "BestelStatus", "caption": "Code" },
+      { "assert": "csClassExists", "name": "Bestelling", "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Bestelling", "name": "Status", "types": ["BestelStatus"], "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Bestelling", "name": "KanNogGewijzigdWorden", "types": ["bool"], "accessors": ["get"], "caption": "Code" },
+      { "assert": "consoleContains", "contains": "Laptop - Nieuw - wijzigbaar: ja", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "Muis - Verzonden - wijzigbaar: nee", "caption": "Uitvoer" }
+   ]
+}

@@ -5,8 +5,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <PublishSingleFile>false</PublishSingleFile>
+    <!-- geen analyzers op de runner zelf: StyleCop is enkel voor de code van de studenten -->
+    <RunAnalyzers>false</RunAnalyzers>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.*" />
+    <!-- StyleCop voor de stijlcontrole: enkel de DLL naast de runner, niet als analyzer op de runner zelf -->
+    <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" IncludeAssets="none" PrivateAssets="all" GeneratePathProperty="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(PkgStyleCop_Analyzers_Unstable)\analyzers\dotnet\cs\StyleCop.Analyzers.dll" Link="analyzers\StyleCop.Analyzers.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

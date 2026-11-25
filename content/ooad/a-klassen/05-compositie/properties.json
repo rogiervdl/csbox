@@ -1,0 +1,9 @@
+{
+   "label": "05. Compositie",
+   "tests": [
+      { "assert": "csPropertyExists", "class": "Bestelling", "name": "Producten", "types": ["List<Product>"], "isAuto": true, "caption": "Code" },
+      { "assert": "consoleContains", "contains": "bestelling 2: #2 — Yuna Kim | 2 product(en) | € 1376,54 | Bezig", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "[3033] Rugzak - € 59,95 | in voorraad", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "[9112] Laptop - € 949,99 | in voorraad", "caption": "Uitvoer" }
+   ]
+}

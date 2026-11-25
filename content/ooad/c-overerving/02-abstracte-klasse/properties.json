@@ -1,0 +1,11 @@
+{
+   "label": "02. Abstracte klasse",
+   "tests": [
+      { "assert": "csClassExists", "name": "CatalogusItem", "modifiers": ["abstract"], "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "CatalogusItem", "name": "Titel", "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "CatalogusItem", "name": "InventarisNummer", "caption": "Code" },
+      { "assert": "csClassExists", "name": "Boek", "base": "CatalogusItem", "caption": "Code" },
+      { "assert": "csClassExists", "name": "EBoek", "base": "CatalogusItem", "caption": "Code" },
+      { "assert": "csClassExists", "name": "FilmDvd", "base": "CatalogusItem", "caption": "Code" }
+   ]
+}

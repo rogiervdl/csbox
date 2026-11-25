@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>CSBox</title>
+   <link rel="icon" type="image/svg+xml" href="img/logo.svg">
+   <link rel="stylesheet" href="vendor/monaco-editor/min/vs/editor/editor.main.css">
+   <link rel="stylesheet" href="css/styles.css">
+   <!-- no defer: runs before render to set theme and configure Monaco loader -->
+   <script src="js/init.js"></script>
+</head>
+<body>
+
+   <!-- toolbar -->
+   <header class="toolbar">
+      <div class="toolbar__brand">
+         <img class="toolbar__logo" src="img/logo.svg" alt="">
+         <span class="toolbar__title">CSBox</span>
+      </div>
+
+      <!-- oefeningen -->
+      <div class="toolbar__exercises">
+         <select id="select-subject" class="select">
+            <option value="">Vak...</option>
+         </select>
+         <select id="select-module" class="select" disabled>
+            <option value="">Module...</option>
+         </select>
+         <select id="select-exercise" class="select" disabled>
+            <option value="">Oefening...</option>
+         </select>
+         <button id="btn-readme" class="btn btn--icon" type="button" title="geen opgave gegeven" disabled>
+            <img src="img/icon-book.svg" alt="">
+            <span>Opgave</span>
+         </button>
+      </div>
+
+      <div class="toolbar__actions">
+         <button id="btn-theme" class="btn btn--icon" type="button" title="Wissel kleurschema" aria-label="Wissel kleurschema">
+            <img src="img/icon-palette.svg" alt="">
+         </button>
+         <button id="btn-layout" class="btn btn--icon" type="button" title="Draai de layout" aria-label="Draai de layout">
+            <img src="img/icon-layout-ttb.svg" alt="">
+         </button>
+         <button type="button" id="btn-run" class="btn btn--primary" title="Voer code uit (Ctrl+Enter)">
+            <img src="img/icon-run.svg" alt="">
+            <span>Run</span>
+         </button>
+         <button type="button" id="btn-stop" class="btn btn--stop" title="Stop programma">
+            <img src="img/icon-stop.svg" alt="">
+            <span>Stop</span>
+         </button>
+      </div>
+   </header>
+
+   <!-- workspace -->
+   <main id="workspace" class="workspace layout-vertical">
+
+      <!-- bestandsbrowser -->
+      <aside id="bestandsbrowser" class="bestandsbrowser" aria-label="Bestanden">
+         <div class="bestandsbrowser__header">
+            <span class="bestandsbrowser__titel">Bestanden</span>
+            <button id="btn-bestand-nieuw" class="btn-minimize" type="button" title="Kies eerst een map: classes of files" aria-label="Nieuw bestand" disabled>
+               <img src="img/icon-plus.svg" alt="">
+            </button>
+            <button id="btn-bestandsbrowser" class="btn-minimize" type="button" title="Klap de bestanden in of uit" aria-label="Klap de bestanden in of uit">
+               <img src="img/icon-chevron-up.svg" alt="">
+            </button>
+         </div>
+         <ul id="lst-bestanden" class="bestandsboom"></ul>
+      </aside>
+
+      <div id="browser-resizer" class="resizer resizer--browser"></div>
+
+      <!-- editorpanelen: Panelen maakt er één per geopend bestand -->
+      <div id="editors-panel" class="editors-panel">
+         <p id="lbl-geen-panelen" class="editors-panel__leeg is-hidden">Kies een bestand in de boom links om het te openen.</p>
+      </div>
+
+      <template id="tpl-paneel">
+         <div class="editor-pane">
+            <div class="editor-pane__header">
+               <span class="editor-pane__label"></span>
+               <div class="editor-pane__actions">
+                  <button class="btn-format" type="button" title="Formatteer code (Alt+Shift+F)" aria-label="Formatteer code">
+                     <img src="img/icon-format.svg" alt="">
+                  </button>
+                  <button class="btn-copy" type="button" title="Kopieer dit bestand naar het klembord" aria-label="Kopieer dit bestand naar het klembord">
+                     <img src="img/icon-copy.svg" alt="">
+                  </button>
+                  <button class="btn-close-pane" type="button" title="Sluit dit paneel" aria-label="Sluit dit paneel">
+                     <img src="img/icon-close.svg" alt="">
+                  </button>
+               </div>
+            </div>
+            <div class="editor-pane__body"></div>
+         </div>
+      </template>
+
+      <div id="main-resizer" class="resizer resizer--main"></div>
+
+      <div class="right-panel" id="right-panel">
+
+         <div class="terminal-panel" id="terminal-panel">
+            <div class="panel-header">
+               <span class="panel-label">Terminal</span>
+               <span id="terminal-status" class="terminal-status"></span>
+               <button type="button" id="terminal-clear" class="console-clear-btn" title="Wis terminal">Wis</button>
+            </div>
+            <pre class="terminal-output" id="terminal-output"></pre>
+            <div class="terminal-inputline" id="terminal-inputline">
+               <span class="terminal-caret">›</span>
+               <input id="terminal-input" class="terminal-input" type="text" placeholder="Typ hier invoer en druk Enter..." disabled autocomplete="off" spellcheck="false">
+            </div>
+         </div>
+
+         <div class="resizer resizer--vertical" id="right-resizer"></div>
+
+         <div class="errors-panel" id="errors-panel">
+            <div class="panel-header" id="errors-toggle">
+               <span class="panel-label">Fouten</span>
+               <span id="errors-badge" class="errors-badge"></span>
+               <button type="button" id="errors-clear" class="console-clear-btn" title="Wis fouten">Wis</button>
+               <button type="button" id="btn-errors-toggle" class="btn-collapse" title="Klap in/uit" aria-label="Klap in/uit">
+                  <img src="img/icon-chevron-up.svg" alt="">
+               </button>
+            </div>
+            <div class="panel-body errors-body" id="errors-body"></div>
+         </div>
+
+      </div>
+
+   </main>
+
+   <!-- footer -->
+   <footer class="voettekst">CSBox · Rogier van der Linde · Odisee</footer>
+
+   <!-- feedback: de knop enkel bij een oefening met tests -->
+   <div class="drijvende-knoppen">
+      <button id="btn-feedback" class="drijvende-knop is-hidden" type="button" title="Vraag feedback op je code">
+         <span class="drijvende-knop__icoon">📝</span><span class="drijvende-knop__tekst">Feedback</span>
+      </button>
+   </div>
+
+   <section id="pnl-feedback" class="feedback is-hidden" aria-label="Feedback">
+      <header class="feedback__header">
+         <span class="feedback__titel">Feedback</span>
+         <button id="btn-feedback-ververs" class="feedback__icoon" type="button" title="Vraag opnieuw feedback op deze code">⟳</button>
+         <button id="btn-feedback-sluiten" class="btn-close" type="button" title="Sluiten">&times;</button>
+      </header>
+      <p class="feedback__disclaimer">Disclaimer: dit is automatisch gegenereerde feedback, met mogelijke fouten of onvolledigheden. Het uiteindelijke cijfer toegekend door de docent kan daardoor licht afwijken.</p>
+      <div id="lst-feedback" class="feedback__berichten" aria-live="polite"></div>
+   </section>
+
+   <!-- cooldown melding -->
+   <div id="modal-cooldown" class="modal" aria-hidden="true">
+      <div class="modal__backdrop"></div>
+      <div class="modal__dialog modal__dialog--sm">
+         <div class="modal__body">
+            <p>Hold your horses, cowboy! Wacht minstens 5s om opnieuw te runnen.</p>
+         </div>
+      </div>
+   </div>
+
+   <!-- bevestigingsdialoog bewaarde versie -->
+   <div id="modal-confirm" class="modal" aria-hidden="true">
+      <div class="modal__backdrop"></div>
+      <div class="modal__dialog modal__dialog--sm">
+         <div class="modal__body">
+            <p>Er is een bewaarde versie gevonden. Wil je deze laden of herbeginnen vanaf de startcode?</p>
+            <div class="modal__actions">
+               <button id="btn-confirm-bewaarde" class="btn btn--primary" type="button">Bewaarde versie</button>
+               <button id="btn-confirm-startcode" class="btn" type="button">Startcode</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- bestand toevoegen of hernoemen -->
+   <div id="modal-bestand" class="modal" aria-hidden="true">
+      <div class="modal__backdrop"></div>
+      <div class="modal__dialog modal__dialog--sm">
+         <div class="modal__header">
+            <span id="lbl-bestand-titel" class="modal__title">Nieuw bestand</span>
+         </div>
+         <div class="modal__body">
+            <form id="frm-bestand" class="bestandsdialoog" novalidate>
+               <div class="bestandsdialoog__veld">
+                  <label class="bestandsdialoog__label" for="inp-bestand-naam">Naam</label>
+                  <input id="inp-bestand-naam" class="bestandsdialoog__invoer" type="text" maxlength="60" autocomplete="off" spellcheck="false">
+               </div>
+               <p id="lbl-bestand-hint" class="bestandsdialoog__hint"></p>
+               <p id="lbl-bestand-fout" class="bestandsdialoog__fout is-hidden"></p>
+               <div class="modal__actions">
+                  <button id="btn-bestand-annuleren" class="btn" type="button">Annuleren</button>
+                  <button id="btn-bestand-ok" class="btn btn--primary" type="submit">Toevoegen</button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+
+   <!-- bestand verwijderen -->
+   <div id="modal-verwijder" class="modal" aria-hidden="true">
+      <div class="modal__backdrop"></div>
+      <div class="modal__dialog modal__dialog--sm">
+         <div class="modal__body">
+            <p id="lbl-verwijder"></p>
+            <div class="modal__actions">
+               <button id="btn-verwijder-annuleren" class="btn" type="button">Annuleren</button>
+               <button id="btn-verwijder-ok" class="btn btn--stop-dialoog" type="button">Verwijderen</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- opgave: los, verplaatsbaar en herschaalbaar paneel i.p.v. een blokkerende modal -->
+   <div id="modal-readme" class="modal" aria-hidden="true">
+      <div class="modal__dialog">
+         <div class="modal__header">
+            <span class="modal__title">Opgave</span>
+            <div class="modal__header-actions">
+               <button id="btn-readme-newtab" class="btn btn--xs btn--icon" type="button" title="Openen in nieuw tabblad" disabled>
+                  <img src="img/icon-external.svg" alt="">
+               </button>
+               <button id="btn-modal-close" class="btn-close" type="button" title="Sluiten">&times;</button>
+            </div>
+         </div>
+         <div id="modal-readme-body" class="modal__body"></div>
+      </div>
+   </div>
+
+   <script src="vendor/marked.min.js"></script>
+   <!-- data-manual: Prism kleurt enkel wat de app vraagt -->
+   <script src="vendor/prism.js" data-manual></script>
+   <script src="vendor/monaco-editor/min/vs/loader.js"></script>
+   <script type="module" src="js/main.js"></script>
+
+</body>
+</html>

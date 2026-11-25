@@ -1,0 +1,13 @@
+{
+   "label": "03. Abstracte members",
+   "tests": [
+      { "assert": "csClassExists", "name": "ValidatieRegel", "modifiers": ["abstract"], "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "ValidatieRegel", "name": "FoutBoodschap", "modifiers": ["abstract"], "caption": "Code" },
+      { "assert": "csMethodExists", "class": "ValidatieRegel", "name": "IsGeldig", "modifiers": ["abstract"], "caption": "Code" },
+      { "assert": "csClassExists", "name": "BevatCijferRegel", "base": "ValidatieRegel", "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "BevatCijferRegel", "name": "FoutBoodschap", "modifiers": ["override"], "caption": "Code" },
+      { "assert": "csMethodExists", "class": "BevatCijferRegel", "name": "IsGeldig", "modifiers": ["override"], "caption": "Code" },
+      { "assert": "consoleContains", "contains": "Waarde moet minstens één cijfer bevatten", "input": ["hamster-kebab"], "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "MagNietBevattenRegel geslaagd", "input": ["hamster-kebab"], "caption": "Uitvoer" }
+   ]
+}

@@ -6,6 +6,28 @@
       "Bash(sleep 3 && curl -s http://localhost:3003 -o /dev/null -w \"%{http_code}\")",
       "Bash(cd C:/Users/rogie/Desktop/csbox && node app.js)",
       "Bash(dotnet publish:*)",
+      "Bash(dotnet build:*)",
+      "Bash(node:*)",
+      "Bash(cd:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(head:*)",
+      "Bash(sed:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Bash(for:*)",
+      "PowerShell(Start-Process:*)",
+      "PowerShell(Start-Sleep:*)",
+      "PowerShell(Invoke-WebRequest:*)",
+      "PowerShell(Get-NetTCPConnection:*)",
+      "PowerShell(Get-CimInstance:*)",
+      "PowerShell(taskkill:*)",
+      "PowerShell(node:*)",
+      "PowerShell($env:PORT=*)",
+      "PowerShell($S=*)",
       "Skill(css-base)",
       "Skill(css-base:*)",
       "Skill(html-base)",
@@ -14,6 +36,10 @@
       "Skill(js-base:*)",
       "Skill(js-app-esmodules)",
       "Skill(js-app-esmodules:*)"
+    ],
+    "deny": [
+      "Bash(git:*)",
+      "PowerShell(git:*)"
     ]
   }
 }

@@ -1,0 +1,10 @@
+{
+   "label": "04. is en as",
+   "tests": [
+      { "assert": "csContainsText", "contains": "is Cardio", "caption": "Code" },
+      { "assert": "csContainsText", "contains": "is Krachttraining", "caption": "Code" },
+      { "assert": "csContainsText", "contains": "is Stretching", "caption": "Code" },
+      { "assert": "consoleContains", "contains": "[Krachttraining] Squat — 80 kg × 8 reps", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "Krachttraining: 272", "caption": "Uitvoer" }
+   ]
+}

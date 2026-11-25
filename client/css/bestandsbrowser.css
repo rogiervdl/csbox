@@ -1,0 +1,226 @@
+/*
+ * Bestandsbrowser styles
+ *
+ * @author Rogier van der Linde <rogier@bitmatters.be>
+ */
+
+/* de browser links van de panelen */
+
+.bestandsbrowser {
+   background: var(--bg-toolbar);
+   display: flex;
+   flex: 0 0 180px;
+   flex-direction: column;
+   min-width: 30px;
+   overflow: hidden;
+}
+
+.bestandsbrowser__header {
+   align-items: center;
+   background: var(--bg-header);
+   border-bottom: 1px solid var(--border);
+   display: flex;
+   flex-shrink: 0;
+   height: 30px;
+   justify-content: space-between;
+   padding: 0 8px 0 12px;
+}
+
+.bestandsbrowser__titel {
+   color: var(--text-muted);
+   flex: 1;
+   font-size: 11px;
+   font-weight: 600;
+   letter-spacing: 1px;
+   text-transform: uppercase;
+}
+
+/* ingeklapt tot een smalle strook */
+
+.bestandsbrowser.is-ingeklapt {
+   flex: 0 0 30px !important;
+
+   & .bestandsbrowser__header {
+      flex-direction: column-reverse;
+      gap: 8px;
+      height: 100%;
+      justify-content: flex-end;
+      padding: 8px 0;
+   }
+
+   & .bestandsbrowser__titel {
+      transform: rotate(180deg);
+      writing-mode: vertical-rl;
+   }
+
+   & .bestandsboom,
+   & #btn-bestand-nieuw {
+      display: none;
+   }
+
+   & .btn-minimize img {
+      transform: rotate(180deg);
+   }
+}
+
+/* de boom */
+
+.bestandsboom {
+   flex: 1;
+   font-size: 13px;
+   list-style: none;
+   overflow: auto;
+   padding: 6px 0;
+
+   & ul {
+      list-style: none;
+      padding-left: 14px;
+   }
+}
+
+.bestandsboom__bestand,
+.bestandsboom__mapnaam {
+   align-items: center;
+   background: none;
+   border: none;
+   color: var(--text-primary);
+   cursor: pointer;
+   display: flex;
+   font: inherit;
+   gap: 6px;
+   overflow: hidden;
+   padding: 3px 12px;
+   text-align: left;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+   width: 100%;
+
+   &:hover {
+      background: var(--btn-collapse-h);
+   }
+}
+
+.bestandsboom__bestand.is-open {
+   background: var(--btn-bg);
+}
+
+/* de gekozen map, waarin de + toevoegt */
+
+.bestandsboom__mapnaam.is-gekozen {
+   box-shadow: inset 2px 0 0 var(--link);
+   color: var(--link);
+}
+
+/* de + zonder gekozen map */
+
+#btn-bestand-nieuw:disabled {
+   cursor: default;
+   opacity: 0.35;
+
+   &:hover {
+      background: none;
+   }
+}
+
+.bestandsboom__icoon {
+   flex-shrink: 0;
+   height: 21px;
+   width: 21px;
+}
+
+/* een bestand met knoppen om te hernoemen en te verwijderen, zichtbaar bij hover of focus */
+
+.bestandsboom__item {
+   align-items: center;
+   display: flex;
+   position: relative;
+
+   &:hover .bestandsboom__acties,
+   &:focus-within .bestandsboom__acties {
+      display: flex;
+   }
+}
+
+.bestandsboom__acties {
+   background: var(--bg-toolbar);
+   display: none;
+   gap: 2px;
+   padding-right: 6px;
+   position: absolute;
+   right: 0;
+}
+
+.bestandsboom__actie {
+   align-items: center;
+   background: none;
+   border: none;
+   border-radius: 3px;
+   cursor: pointer;
+   display: flex;
+   height: 20px;
+   justify-content: center;
+   padding: 0;
+   width: 20px;
+
+   &:hover {
+      background: var(--btn-collapse-h);
+   }
+
+   & img {
+      height: 13px;
+      width: 13px;
+   }
+}
+
+/* de dialoog om een bestand toe te voegen of te hernoemen */
+
+.bestandsdialoog__veld {
+   display: flex;
+   flex-direction: column;
+   gap: 4px;
+   margin-bottom: 12px;
+}
+
+.bestandsdialoog__label {
+   color: var(--text-muted);
+   font-size: 12px;
+}
+
+.bestandsdialoog__invoer {
+   background: var(--bg-base);
+   border: 1px solid var(--border);
+   border-radius: 4px;
+   color: var(--text-primary);
+   font-family: inherit;
+   font-size: 14px;
+   height: auto;
+   padding: 7px 9px;
+}
+
+.bestandsdialoog__hint {
+   color: var(--text-muted);
+   font-size: 12px;
+}
+
+.bestandsdialoog__fout {
+   color: var(--error-color);
+   font-size: 13px;
+   margin-top: 8px;
+}
+
+/* een dichtgeklapte map verbergt haar inhoud */
+
+.bestandsboom__map.is-dicht > ul {
+   display: none;
+}
+
+/* light theme */
+
+html[data-theme="light"] {
+   /* de gele mapiconen blijven geel */
+   & .bestandsboom__icoon:not(.bestandsboom__icoon--map),
+   & .bestandsboom__actie img,
+   & .bestandsbrowser .btn-minimize img {
+      filter: brightness(0.5);
+   }
+}

@@ -1,0 +1,12 @@
+{
+   "label": "05. base",
+   "tests": [
+      { "assert": "csClassExists", "name": "Manager", "base": "Medewerker", "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Manager", "name": "TeamGrootte", "caption": "Code" },
+      { "assert": "csConstructorExists", "class": "Manager", "numParameters": 3, "caption": "Code" },
+      { "assert": "csContainsText", "class": "Manager", "contains": "/: ?base/", "caption": "Code", "description": "constructor van `Manager` roept `: base(...)` aan" },
+      { "assert": "csContainsText", "class": "Manager", "contains": "base.ToString()", "caption": "Code" },
+      { "assert": "consoleContains", "contains": "Youssef El Amrani (Sales)", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "Sofia Dimitriou (HR), team: 5 personen", "caption": "Uitvoer" }
+   ]
+}

@@ -1,0 +1,9 @@
+{
+   "label": "05. Enum conversies",
+   "tests": [
+      { "assert": "csEnumExists", "name": "Prioriteit", "values": ["Laag", "Normaal", "Hoog", "Kritiek"], "caption": "Code" },
+      { "assert": "consoleContains", "contains": "Enumwaarde: Hoog", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "Als int: 2", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "hogere prioriteit: Kritiek", "caption": "Uitvoer" }
+   ]
+}

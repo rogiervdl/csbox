@@ -1,0 +1,7 @@
+{
+   "label": "04. ToString()",
+   "tests": [
+      { "assert": "csMethodExists", "class": "Product", "name": "ToString", "modifiers": ["override"], "caption": "Code" },
+      { "assert": "consoleContains", "contains": "product #1: [2876] Bureaulamp - € 34,50 | niet in voorraad", "caption": "Uitvoer" }
+   ]
+}

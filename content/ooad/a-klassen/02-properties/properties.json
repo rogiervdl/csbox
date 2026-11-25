@@ -1,0 +1,12 @@
+{
+   "label": "02. Properties",
+   "tests": [
+      { "assert": "csClassExists", "name": "Recept", "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Recept", "name": "Titel", "types": ["string"], "isAuto": true, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Recept", "name": "Rating", "types": ["int"], "isAuto": true, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Recept", "name": "IsVegetarisch", "types": ["bool"], "isAuto": true, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "Recept", "name": "Ingredienten", "types": ["List<string>"], "isAuto": true, "caption": "Code" },
+      { "assert": "consoleContains", "contains": "vegetarische recepten in het kookboek: 1", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "rating is 4,3", "caption": "Uitvoer" }
+   ]
+}

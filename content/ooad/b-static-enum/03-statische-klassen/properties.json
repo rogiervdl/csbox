@@ -1,0 +1,13 @@
+{
+   "label": "03. Statische klassen",
+   "tests": [
+      { "assert": "csClassExists", "name": "TekstAnalyse", "caption": "Code" },
+      { "assert": "csVariableExists", "class": "TekstAnalyse", "name": "verbodenWoorden", "types": ["string[]"], "modifiers": ["private", "static"], "caption": "Code" },
+      { "assert": "csVariableExists", "class": "TekstAnalyse", "name": "verbodenKarakters", "types": ["char[]"], "modifiers": ["private", "static"], "caption": "Code" },
+      { "assert": "csMethodExists", "class": "TekstAnalyse", "name": "AantalWoorden", "modifiers": ["public", "static"], "paramTypes": ["string"], "returnType": "int", "caption": "Code" },
+      { "assert": "csMethodExists", "class": "TekstAnalyse", "name": "BevatVerbodenWoord", "modifiers": ["public", "static"], "paramTypes": ["string"], "returnType": "bool", "caption": "Code" },
+      { "assert": "csMethodExists", "class": "TekstAnalyse", "name": "BevatVerbodenKarakter", "modifiers": ["public", "static"], "paramTypes": ["string"], "returnType": "bool", "caption": "Code" },
+      { "assert": "consoleContains", "contains": "'dit is een test':\n - bevat 4 woorden\n - is geschikt voor een titel", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "'Workshop C# basis':\n - bevat 3 woorden\n - bevat verboden karakter\n - is niet geschikt voor een titel", "caption": "Uitvoer" }
+   ]
+}

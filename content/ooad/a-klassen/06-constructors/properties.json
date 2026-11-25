@@ -1,0 +1,7 @@
+{
+   "label": "06. Constructors",
+   "tests": [
+      { "assert": "csConstructorExists", "class": "ProfielInfo", "numParameters": 3, "caption": "Code" },
+      { "assert": "csConstructorExists", "class": "ProfielInfo", "numParameters": 8, "caption": "Code" }
+   ]
+}

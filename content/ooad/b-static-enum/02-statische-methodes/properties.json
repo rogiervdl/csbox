@@ -1,0 +1,13 @@
+{
+   "label": "02. Statische methodes",
+   "tests": [
+      { "assert": "csClassExists", "name": "CouponCode", "caption": "Code" },
+      { "assert": "csVariableExists", "class": "CouponCode", "name": "/^_?couponRegex$/i", "types": ["string"], "modifiers": ["private", "static"], "caption": "Code", "description": "private static veld `_couponRegex` (`string`)" },
+      { "assert": "csPropertyExists", "class": "CouponCode", "name": "Code", "types": ["string"], "isAuto": true, "caption": "Code" },
+      { "assert": "csPropertyExists", "class": "CouponCode", "name": "IsGeldig", "types": ["bool"], "accessors": ["get"], "caption": "Code" },
+      { "assert": "consoleContains", "contains": "ABC12-DE is geldig", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "AB12-DE is ongeldig", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "Code ABC12-DE: Prefix=ABC, Nummer=12, Regio=DE", "caption": "Uitvoer" },
+      { "assert": "consoleContains", "contains": "Code AB12-DE: ongeldige code", "caption": "Uitvoer" }
+   ]
+}

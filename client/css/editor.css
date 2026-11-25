@@ -1,0 +1,206 @@
+/*
+ * Editor styles: de editorpanelen
+ *
+ * @author Rogier van der Linde <rogier@bitmatters.be>
+ */
+
+/* editors panel */
+
+.editors-panel {
+   display: flex;
+   flex: 0 0 50%;
+   flex-direction: row;
+   min-width: 200px;
+   overflow: hidden;
+}
+
+/* uitleg zonder panelen */
+
+.editors-panel__leeg {
+   align-self: center;
+   color: var(--text-muted);
+   flex: 1;
+   font-size: 13px;
+   padding: 20px;
+   text-align: center;
+}
+
+/* editor pane */
+
+.editor-pane {
+   border-right: 1px solid var(--border);
+   display: flex;
+   flex: 1 1 0;
+   flex-direction: column;
+   min-height: 0;
+   min-width: 0;
+   overflow: hidden;
+
+   &:last-child {
+      border-right: none;
+   }
+}
+
+.editor-pane__header {
+   align-items: center;
+   background: var(--bg-header);
+   border-bottom: 1px solid var(--border);
+   display: flex;
+   flex-shrink: 0;
+   gap: 8px;
+   height: 30px;
+   justify-content: space-between;
+   padding: 0 8px 0 12px;
+}
+
+/* het pad van het bestand */
+
+.editor-pane__label {
+   color: var(--text-primary);
+   font-size: 12px;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.editor-pane__body {
+   flex: 1;
+   overflow: hidden;
+}
+
+/* een afbeelding in een paneel */
+
+.editor-pane__body--afbeelding {
+   align-items: center;
+   background: repeating-conic-gradient(#2a2a2a 0% 25%, #333 0% 50%) 50% / 20px 20px;
+   display: flex;
+   justify-content: center;
+   overflow: auto;
+   padding: 12px;
+}
+
+.editor-pane__afbeelding {
+   max-height: 100%;
+   max-width: 100%;
+   object-fit: contain;
+}
+
+/* knoppen in de kop */
+
+.btn-minimize,
+.btn-format,
+.btn-copy,
+.btn-close-pane {
+   align-items: center;
+   background: none;
+   border: none;
+   border-radius: 3px;
+   color: var(--text-muted);
+   cursor: pointer;
+   display: flex;
+   flex-shrink: 0;
+   height: 20px;
+   justify-content: center;
+   padding: 0;
+   transition: background 0.15s, color 0.15s;
+   width: 20px;
+
+   &:hover {
+      background: var(--btn-collapse-h);
+      color: var(--text-primary);
+   }
+
+   & img {
+      height: 14px;
+      transition: transform 0.2s;
+      width: 14px;
+   }
+}
+
+.editor-pane__actions {
+   align-items: center;
+   display: flex;
+   flex-shrink: 0;
+   gap: 2px;
+}
+
+/* bevestiging na het kopiëren */
+
+.btn-copy.is-copied {
+   background: var(--accent-run);
+
+   & img {
+      filter: brightness(2);
+   }
+}
+
+/* panelen onder elkaar */
+
+.workspace.layout-vertical {
+   & .editors-panel {
+      flex-direction: column;
+   }
+
+   & .editor-pane {
+      border-bottom: 1px solid var(--border);
+      border-right: none;
+
+      &:last-child {
+         border-bottom: none;
+      }
+   }
+
+   & .resizer--paneel {
+      cursor: row-resize;
+      height: var(--resizer-w);
+      width: auto;
+   }
+}
+
+/* panelen in omgekeerde volgorde: van rechts naar links, of van onder naar boven */
+
+.workspace.layout-reverse {
+   & .editors-panel {
+      flex-direction: row-reverse;
+   }
+
+   & .editor-pane {
+      border-left: 1px solid var(--border);
+      border-right: none;
+
+      &:last-child {
+         border-left: none;
+      }
+   }
+}
+
+.workspace.layout-vertical.layout-reverse {
+   & .editors-panel {
+      flex-direction: column-reverse;
+   }
+
+   & .editor-pane {
+      border-bottom: none;
+      border-left: none;
+      border-top: 1px solid var(--border);
+
+      &:last-child {
+         border-top: none;
+      }
+   }
+}
+
+/* light theme */
+
+html[data-theme="light"] {
+   & .btn-minimize img,
+   & .btn-format img,
+   & .btn-copy img,
+   & .btn-close-pane img {
+      filter: brightness(0.5);
+   }
+
+   & .editor-pane__body--afbeelding {
+      background: repeating-conic-gradient(#e8e8e8 0% 25%, #f8f8f8 0% 50%) 50% / 20px 20px;
+   }
+}

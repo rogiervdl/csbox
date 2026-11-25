@@ -1,0 +1,150 @@
+/*
+ * Kleurschema's: een donkere of lichte basis (data-theme) met eigen kleuren
+ * per schema (data-schema), zoals in WebBox
+ *
+ * @author Rogier van der Linde <rogier@bitmatters.be>
+ */
+
+/* donker (standaard) */
+
+:root {
+   --accent-cs: #512bd4;
+   --accent-dl: #2b5797;
+   --accent-dl-h: #3a6ec0;
+   --accent-run: #0e7a3d;
+   --accent-run-h: #11a050;
+   --bg-base: #1e1e1e;
+   --bg-header: #2d2d30;
+   --bg-terminal: #1e1e1e;
+   --bg-toolbar: #252526;
+   --border: #3e3e42;
+   --btn-bg: #3c3c3c;
+   --btn-bg-h: #4a4a4a;
+   --btn-collapse-h: #3e3e42;
+   --btn-text: #ffffff;
+   --error-bg: color-mix(in srgb, var(--error-color) 10%, var(--bg-terminal));
+   --error-border: color-mix(in srgb, var(--error-color) 20%, var(--bg-terminal));
+   --error-color: #f48771;
+   --footer-h: 24px;
+   --input-border: var(--border);
+   --link: #6cb6ff;
+   --placeholder: #666666;
+   --resizer-w: 5px;
+   --scrollbar-bg: var(--bg-base);
+   --scrollbar-h: #777777;
+   --scrollbar-thumb: #555555;
+   --text-code: var(--text-primary);
+   --text-muted: #858585;
+   --text-primary: #cccccc;
+   --text-title: #d4d4d4;
+   --toolbar-h: 44px;
+   --warn-bg: color-mix(in srgb, var(--warn-color) 10%, var(--bg-terminal));
+   --warn-border: color-mix(in srgb, var(--warn-color) 20%, var(--bg-terminal));
+   --warn-color: #e5c07b;
+
+   /* terminalkleuren voor ConsoleColor, naar de donkere terminal van VS Code */
+   --ansi-30: #555555;
+   --ansi-31: #cd3131;
+   --ansi-32: #0dbc79;
+   --ansi-33: #e5e510;
+   --ansi-34: #2472c8;
+   --ansi-35: #bc3fbc;
+   --ansi-36: #11a8cd;
+   --ansi-37: #e5e5e5;
+   --ansi-90: #666666;
+   --ansi-91: #f14c4c;
+   --ansi-92: #23d18b;
+   --ansi-93: #f5f543;
+   --ansi-94: #3b8eea;
+   --ansi-95: #d670d6;
+   --ansi-96: #29b8db;
+   --ansi-97: #ffffff;
+}
+
+/* lichte basis */
+
+html[data-theme="light"] {
+   --bg-base: #f3f3f3;
+   --bg-header: #e0e0e0;
+   --bg-terminal: #ffffff;
+   --bg-toolbar: #e8e8e8;
+   --border: #d0d0d0;
+   --btn-bg: #d8d8d8;
+   --btn-bg-h: #c8c8c8;
+   --btn-collapse-h: #cccccc;
+   --btn-text: #1e1e1e;
+   --error-color: #b3261e;
+   --link: #0b5ed7;
+   --placeholder: #aaaaaa;
+   --scrollbar-h: #999999;
+   --scrollbar-thumb: #bbbbbb;
+   --text-muted: #666666;
+   --text-primary: #1e1e1e;
+   --text-title: #1e1e1e;
+   --warn-color: #7a5800;
+
+   /* terminalkleuren voor ConsoleColor, naar de lichte terminal van VS Code */
+   --ansi-30: #000000;
+   --ansi-31: #cd3131;
+   --ansi-32: #00bc00;
+   --ansi-33: #949800;
+   --ansi-34: #0451a5;
+   --ansi-35: #bc05bc;
+   --ansi-36: #0598bc;
+   --ansi-37: #555555;
+   --ansi-90: #666666;
+   --ansi-91: #cd3131;
+   --ansi-92: #14ce14;
+   --ansi-93: #b5ba00;
+   --ansi-94: #0451a5;
+   --ansi-95: #bc05bc;
+   --ansi-96: #0598bc;
+   --ansi-97: #a5a5a5;
+}
+
+/* okaida: donkere basis, naar Prism Okaidia */
+
+html[data-schema="okaida"] {
+   --bg-base: #272822;
+   --bg-header: #3e3d32;
+   --bg-terminal: #272822;
+   --bg-toolbar: #2c2d25;
+   --border: #49483e;
+   --btn-bg: #3e3d32;
+   --btn-bg-h: #49483e;
+   --btn-collapse-h: #49483e;
+   --error-color: #f92672;
+   --link: #66d9ef;
+   --text-muted: #8292a2;
+   --text-primary: #f8f8f2;
+   --text-title: #f8f8f2;
+   --warn-color: #e6db74;
+}
+
+/* coy: lichte basis, naar Prism Coy */
+
+html[data-schema="coy"] {
+   --bg-base: #f0f4f8;
+   --bg-header: #cfd4e9;
+   --bg-terminal: #fdfdfd;
+   --bg-toolbar: #e3e8f4;
+   --border: #b1b8d8;
+   --error-color: #c92c2c;
+   --link: #1990b8;
+   --text-muted: #5f6364;
+}
+
+/* zand: lichte basis, naar de standaardkleuren van reposchecker */
+
+html[data-schema="zand"] {
+   --bg-base: #f1f0e2;
+   --bg-header: #e1e0c3;
+   --bg-terminal: #fcfcf4;
+   --bg-toolbar: #e9e8d2;
+   --border: #ceceb4;
+   --error-color: #990000;
+   --link: #0077aa;
+   --text-muted: #555555;
+   --text-primary: #000000;
+   --text-title: #000000;
+}
